@@ -1,0 +1,51 @@
+.category-icon {
+  align-items: center;
+  background: var(--icon-bg);
+  border-radius: 15px;
+  color: var(--icon-ink);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: ui-rounded, 'SF Pro Rounded', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
+}
+
+.small {
+  border-radius: 11px;
+  font-size: 15px;
+  height: 36px;
+  width: 36px;
+}
+.large {
+  border-radius: 20px;
+  font-size: 25px;
+  height: 60px;
+  width: 60px;
+}
+.mint {
+  --icon-bg: #dff4e7;
+  --icon-ink: #26724a;
+}
+.lilac {
+  --icon-bg: #ebe6ff;
+  --icon-ink: #6652b8;
+}
+.lime {
+  --icon-bg: #dffb92;
+  --icon-ink: #435f08;
+}
+.rose {
+  --icon-bg: #ffe4e1;
+  --icon-ink: #b64e4a;
+}
+.sky {
+  --icon-bg: #e0effc;
+  --icon-ink: #34729f;
+}
+.peach {
+  --icon-bg: #ffebd6;
+  --icon-ink: #9a5f27;
+}

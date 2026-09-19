@@ -1,0 +1,130 @@
+<div class="page transactions-page">
+  <header class="page-header">
+    <h1>Movimientos</h1>
+    <button type="button" aria-label="Exportar movimientos" (click)="export()">
+      <app-icon name="download" />
+    </button>
+  </header>
+  <app-month-navigation [value]="store.selectedMonth()" (valueChange)="changeMonth($event)" />
+  <section class="month-summary">
+    <span>Gastos del mes</span>
+    <strong>{{ store.formatMoney(store.monthExpenses()) }}</strong>
+  </section>
+  <div class="filters" role="group" aria-label="Tipo de movimiento">
+    <button
+      type="button"
+      [class.active]="filter() === 'all'"
+      [attr.aria-pressed]="filter() === 'all'"
+      (click)="filter.set('all')"
+    >
+      Todos
+    </button>
+    <button
+      type="button"
+      [class.active]="filter() === 'expense'"
+      [attr.aria-pressed]="filter() === 'expense'"
+      (click)="filter.set('expense')"
+    >
+      Gastos
+    </button>
+    <button
+      type="button"
+      [class.active]="filter() === 'income'"
+      [attr.aria-pressed]="filter() === 'income'"
+      (click)="filter.set('income')"
+    >
+      Ingresos
+    </button>
+  </div>
+  @if (visibleTransactions().length) {
+    <p class="swipe-hint">Desliza a la derecha para editar · a la izquierda para eliminar</p>
+  }
+  <ion-list class="activity-list" lines="none" aria-label="Movimientos del mes">
+    @for (transaction of visibleTransactions(); track transaction.id) {
+      <ion-item-sliding #sliding>
+        <ion-item-options side="start" (ionSwipe)="edit(transaction, sliding)">
+          <ion-item-option
+            class="edit-option"
+            [expandable]="true"
+            (click)="edit(transaction, sliding)"
+            [attr.aria-label]="'Editar ' + transaction.merchant"
+            ><app-icon name="edit" /><span>Editar</span></ion-item-option
+          >
+        </ion-item-options>
+        <ion-item
+          class="movement-item"
+          tabindex="0"
+          [attr.aria-label]="
+            transaction.merchant + '. Flecha derecha para editar, izquierda para eliminar.'
+          "
+          (keydown.arrowright)="sliding.open('start'); $event.preventDefault()"
+          (keydown.arrowleft)="sliding.open('end'); $event.preventDefault()"
+          (keydown.enter)="edit(transaction, sliding)"
+          (keydown.delete)="requestDelete(transaction, sliding)"
+        >
+          <div class="activity-row">
+            <app-category-icon [icon]="transaction.icon" [color]="transaction.color" size="small" />
+            <div class="movement-copy">
+              <h2>{{ transaction.merchant }}</h2>
+              <p>{{ transaction.category }} · {{ store.formatDate(transaction.date) }}</p>
+            </div>
+            <strong [class.income]="transaction.kind === 'income'"
+              >{{ transaction.kind === 'expense' ? '−' : '+'
+              }}{{ store.formatMoney(transaction.amount) }}</strong
+            >
+          </div>
+        </ion-item>
+        <ion-item-options side="end" (ionSwipe)="requestDelete(transaction, sliding)">
+          <ion-item-option
+            class="delete-option"
+            [expandable]="true"
+            (click)="requestDelete(transaction, sliding)"
+            [attr.aria-label]="'Eliminar ' + transaction.merchant"
+            ><app-icon name="trash" /><span>Eliminar</span></ion-item-option
+          >
+        </ion-item-options>
+      </ion-item-sliding>
+    } @empty {
+      <div class="empty-state">
+        <app-icon name="receipt" />
+        <h2>No hay movimientos</h2>
+        <p>Registra uno con el botón + o cambia de mes.</p>
+      </div>
+    }
+  </ion-list>
+</div>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="!!pendingDelete()"
+  (didDismiss)="cancelDelete()"
+  aria-label="Eliminar movimiento"
+>
+  <ng-template>
+    <section class="compact-sheet delete-sheet">
+      <header class="dialog-header">
+        <h2>Eliminar movimiento</h2>
+        <button type="button" aria-label="Cerrar" (click)="cancelDelete()">
+          <app-icon name="close" />
+        </button>
+      </header>
+      @if (pendingDelete(); as transaction) {
+        <div class="delete-preview">
+          <app-category-icon [icon]="transaction.icon" [color]="transaction.color" />
+          <div>
+            <strong>{{ transaction.merchant }}</strong>
+            <p>{{ store.formatMoney(transaction.amount) }}</p>
+          </div>
+        </div>
+        <p class="dialog-copy">¿Quieres eliminar este movimiento?</p>
+        @if (deleteError()) {
+          <p class="dialog-error" role="alert">{{ deleteError() }}</p>
+        }
+        <div class="dialog-actions">
+          <button type="button" class="secondary" (click)="cancelDelete()">Cancelar</button
+          ><button type="button" class="destructive" (click)="remove()">Eliminar</button>
+        </div>
+      }
+    </section>
+  </ng-template>
+</ion-modal>

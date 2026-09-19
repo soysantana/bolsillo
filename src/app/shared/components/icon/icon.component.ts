@@ -1,0 +1,81 @@
+import { Component, Input } from '@angular/core';
+import { IonIcon } from '@ionic/angular';
+import {
+  addOutline,
+  arrowDownCircleOutline,
+  arrowForwardOutline,
+  barChartOutline,
+  basketOutline,
+  calendarOutline,
+  carOutline,
+  chevronForwardOutline,
+  chevronUpOutline,
+  checkmarkCircleOutline,
+  closeOutline,
+  cloudDoneOutline,
+  createOutline,
+  downloadOutline,
+  eyeOutline,
+  eyeOffOutline,
+  fingerPrintOutline,
+  flagOutline,
+  heartOutline,
+  homeOutline,
+  helpCircleOutline,
+  notificationsOutline,
+  personOutline,
+  personAddOutline,
+  receiptOutline,
+  searchOutline,
+  ticketOutline,
+  trashOutline,
+  walletOutline,
+} from 'ionicons/icons';
+const icons: Record<string, string> = {
+  add: addOutline,
+  income: arrowDownCircleOutline,
+  spark: arrowDownCircleOutline,
+  arrow: arrowForwardOutline,
+  activity: barChartOutline,
+  basket: basketOutline,
+  calendar: calendarOutline,
+  car: carOutline,
+  chevron: chevronForwardOutline,
+  up: chevronUpOutline,
+  check: checkmarkCircleOutline,
+  close: closeOutline,
+  cloud: cloudDoneOutline,
+  edit: createOutline,
+  download: downloadOutline,
+  eye: eyeOutline,
+  'eye-off': eyeOffOutline,
+  fingerprint: fingerPrintOutline,
+  goal: flagOutline,
+  heart: heartOutline,
+  home: homeOutline,
+  help: helpCircleOutline,
+  notifications: notificationsOutline,
+  profile: personOutline,
+  invite: personAddOutline,
+  receipt: receiptOutline,
+  search: searchOutline,
+  ticket: ticketOutline,
+  coffee: ticketOutline,
+  trash: trashOutline,
+  wallet: walletOutline,
+};
+@Component({
+  selector: 'app-icon',
+  standalone: true,
+  imports: [IonIcon],
+  template: '<ion-icon [icon]="value" aria-hidden="true" />',
+  styles: [
+    ':host { display: inline-flex; width: 1.25em; height: 1.25em; vertical-align: middle; flex-shrink: 0; } ion-icon { width: 100%; height: 100%; }',
+  ],
+})
+export class IconComponent {
+  @Input() name = 'receipt';
+  get value(): string {
+    return icons[this.name] ?? icons['receipt'];
+  }
+}

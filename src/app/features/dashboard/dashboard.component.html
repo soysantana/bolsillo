@@ -1,0 +1,116 @@
+<div class="page dashboard-page">
+  <header class="topbar">
+    <div class="avatar" aria-hidden="true">
+      <span>{{ store.initials() }}</span>
+    </div>
+    <div class="greeting">
+      <p>{{ greeting }},</p>
+      <h1>{{ store.name() }}</h1>
+    </div>
+    <a class="round-button icon-link" routerLink="/perfil" aria-label="Ir a mi perfil"
+      ><app-icon name="profile"
+    /></a>
+  </header>
+  <section class="balance-card">
+    <div class="balance-head">
+      <span>Saldo disponible</span
+      ><button
+        type="button"
+        [attr.aria-label]="store.hideBalances() ? 'Mostrar montos' : 'Ocultar montos'"
+        [attr.aria-pressed]="store.hideBalances()"
+        (click)="store.toggleBalances()"
+      >
+        <app-icon [name]="store.hideBalances() ? 'eye-off' : 'eye'" />
+      </button>
+    </div>
+    <strong>{{ store.formatMoney(store.available()) }}</strong>
+    <p>Saldo de tu cuenta menos lo reservado para metas.</p>
+    <div class="balance-footer">
+      <div>
+        <small>Saldo total</small><b>{{ store.formatMoney(store.totalBalance()) }}</b>
+      </div>
+      <i></i>
+      <div>
+        <small>Reservado para metas</small><b>{{ store.formatMoney(store.reserved()) }}</b>
+      </div>
+    </div>
+  </section>
+  @if (store.available() < 0) {
+    <p class="balance-warning"><app-icon name="wallet" /><span>Tu saldo disponible está en negativo.</span></p>
+  }
+  <section class="section-block activity-summary">
+    <div class="section-title">
+      <div><h2>Últimos 7 días</h2></div>
+      <a routerLink="/movimientos">Ver movimientos</a>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <small>Gastos registrados</small
+          ><strong>{{ store.formatMoney(store.weekTotal()) }}</strong>
+        </div>
+      </div>
+      @if (store.hideBalances()) {
+        <p class="muted">Gráfico oculto</p>
+      } @else {
+        <div
+          class="bar-chart"
+          role="img"
+          aria-label="Gastos de los últimos siete días"
+        >
+          @for (day of store.weekDays(); track day.date; let last = $last) {
+            <div class="bar-column">
+              <i [style.height.px]="barHeight(day.amount)" [class.today]="last"></i
+              ><small>{{ day.label }}</small>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+  <section class="section-block recent-section">
+    <div class="section-title">
+      <div><h2>Movimientos recientes</h2></div>
+      <a routerLink="/movimientos">Ver todos</a>
+    </div>
+    <div class="transaction-list">
+      @for (transaction of store.transactions().slice(0, 4); track transaction.id) {
+        <article class="transaction-row">
+          <app-category-icon [icon]="transaction.icon" [color]="transaction.color" />
+          <div class="transaction-copy">
+            <h3>{{ transaction.merchant }}</h3>
+            <p>{{ transaction.category }} · {{ store.formatDate(transaction.date) }}</p>
+          </div>
+          <strong [class.income]="transaction.kind === 'income'"
+            >{{ transaction.kind === 'expense' ? '−' : '+'
+            }}{{ store.formatMoney(transaction.amount) }}</strong
+          >
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <h3>Aún no hay movimientos</h3>
+          <p>Usa el botón + para registrar tu primer gasto o ingreso.</p>
+        </div>
+      }
+    </div>
+  </section>
+  @if (store.payments()[0]; as payment) {
+    <section class="section-block pocket-tip">
+      <app-icon name="calendar" />
+      <div>
+        <span>{{ payment.date < store.weekDays()[6].date ? 'PAGO VENCIDO' : 'PRÓXIMO PAGO' }}</span>
+        <p>
+          {{ payment.name }} · {{ store.formatDate(payment.date) }} ·
+          {{ store.formatMoney(payment.amount) }}
+        </p>
+      </div>
+      <a routerLink="/plan" aria-label="Ver pagos pendientes"><app-icon name="arrow" /></a>
+    </section>
+  } @else if (!store.transactions().length) {
+    <section class="section-block pocket-tip">
+      <app-icon name="wallet" />
+      <div><p>Agrega el saldo inicial de tu cuenta para empezar.</p></div>
+      <a routerLink="/perfil" aria-label="Configurar mi cuenta"><app-icon name="arrow" /></a>
+    </section>
+  }
+</div>

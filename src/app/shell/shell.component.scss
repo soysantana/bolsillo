@@ -1,0 +1,107 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.device-shell {
+  background: var(--wallet-bg);
+  min-height: var(--app-viewport-height, 100dvh);
+  position: relative;
+}
+
+.page-viewport {
+  --background: var(--wallet-bg);
+  --padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  height: var(--app-viewport-height, 100dvh);
+}
+
+.page-viewport::part(scroll) {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.page-viewport::part(scroll)::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+.bottom-nav {
+  align-items: center;
+  background: color-mix(in srgb, #fff 92%, transparent);
+  border: 1px solid #eeeae1;
+  border-bottom: 0;
+  border-radius: 25px 25px 0 0;
+  bottom: 0;
+  box-shadow: 0 -12px 35px #4d473918;
+  display: grid;
+  grid-template-columns: 1fr 1fr 68px 1fr 1fr;
+  left: 0;
+  min-height: calc(74px + env(safe-area-inset-bottom));
+  padding: 8px 9px env(safe-area-inset-bottom);
+  position: fixed;
+  right: 0;
+  z-index: 30;
+
+  a {
+    align-items: center;
+    color: #9b9b93;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    min-height: 54px;
+    text-decoration: none;
+  }
+
+  a.active {
+    color: var(--wallet-ink);
+  }
+  small {
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.add-button {
+  align-items: center;
+  align-self: start;
+  background: var(--wallet-ink);
+  border: 5px solid var(--wallet-bg);
+  border-radius: 21px;
+  box-shadow: 0 9px 20px #17191435;
+  color: var(--wallet-accent);
+  display: flex;
+  font-size: 27px;
+  height: 58px;
+  justify-content: center;
+  justify-self: center;
+  margin-top: -24px;
+  transform: rotate(3deg);
+  width: 58px;
+
+  span {
+    display: block;
+    transform: rotate(-3deg);
+  }
+}
+
+@media (min-width: 620px) {
+  .device-shell {
+    box-shadow: 0 0 70px #443c2924;
+    margin: 0 auto;
+    max-width: 500px;
+  }
+  .bottom-nav {
+    left: 50%;
+    max-width: 500px;
+    transform: translateX(-50%);
+  }
+}
+
+.bottom-nav app-icon {
+  font-size: 21px;
+}
+.bottom-nav small {
+  font-size: 11px;
+}

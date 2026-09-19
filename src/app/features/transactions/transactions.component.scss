@@ -1,0 +1,249 @@
+.transactions-page {
+  padding: max(25px, env(safe-area-inset-top)) 16px 26px;
+}
+
+.page-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px 21px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.page-header button {
+  align-items: center;
+  background: var(--wallet-surface);
+  border: 1px solid var(--wallet-line);
+  border-radius: 50%;
+  color: var(--wallet-ink);
+  display: grid;
+  font-size: 20px;
+  height: 43px;
+  place-items: center;
+  width: 43px;
+}
+
+.month-summary {
+  align-items: center;
+  background: #20251f;
+  border-radius: 24px;
+  color: white;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 2px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 17px 18px;
+}
+
+.month-summary span {
+  color: #c5ccc2;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.month-summary strong {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.filters {
+  background: var(--wallet-surface);
+  border: 1px solid var(--wallet-line);
+  border-radius: 17px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 13px 0 14px;
+  padding: 4px;
+}
+
+.filters button {
+  background: transparent;
+  border: 0;
+  border-radius: 13px;
+  color: var(--wallet-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  min-width: 0;
+  padding: 10px 6px;
+}
+
+.filters button.active {
+  background: var(--wallet-ink);
+  color: white;
+}
+
+.swipe-hint {
+  color: var(--wallet-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 2px 10px;
+}
+
+.activity-list {
+  background: var(--wallet-surface);
+  border: 1px solid var(--wallet-line);
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 0;
+}
+
+ion-item-sliding {
+  background: var(--wallet-surface);
+}
+
+ion-item-sliding:not(:last-child) {
+  border-bottom: 1px solid var(--wallet-line);
+}
+
+.movement-item {
+  --background: var(--wallet-surface);
+  --border-color: transparent;
+  --inner-border-width: 0;
+  --inner-padding-bottom: 0;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --inner-padding-top: 0;
+  --min-height: 0;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+}
+
+.activity-row {
+  align-items: center;
+  display: grid;
+  gap: 11px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  padding: 14px 16px;
+  width: 100%;
+}
+
+.movement-copy {
+  min-width: 0;
+}
+
+.activity-row h2 {
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-row p {
+  color: var(--wallet-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-row > strong {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  max-width: 108px;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.activity-row > strong.income {
+  color: var(--wallet-positive);
+}
+
+ion-item-option {
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  min-width: 86px;
+}
+
+ion-item-option app-icon {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.edit-option {
+  --background: #2f5e3d;
+}
+
+.delete-option {
+  --background: #9f3d2c;
+}
+
+.empty-state {
+  color: var(--wallet-muted);
+  padding: 46px 18px;
+  text-align: center;
+}
+
+.empty-state app-icon {
+  font-size: 34px;
+}
+
+.empty-state h2 {
+  color: var(--wallet-ink);
+  font-size: 16px;
+  margin: 10px 0 4px;
+}
+
+.empty-state p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.delete-preview {
+  align-items: center;
+  background: var(--wallet-soft);
+  border-radius: 18px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 46px minmax(0, 1fr);
+  margin-top: 16px;
+  padding: 13px;
+}
+
+.delete-preview strong,
+.delete-preview p {
+  display: block;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-preview p {
+  color: var(--wallet-muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+@media (max-width: 360px) {
+  .activity-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .activity-row > strong {
+    grid-column: 2;
+    max-width: none;
+    text-align: left;
+  }
+}

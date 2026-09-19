@@ -1,0 +1,186 @@
+<div class="page profile-page">
+  <header class="profile-header">
+    <span>Tu espacio</span>
+    <h1>Perfil</h1>
+  </header>
+
+  <section class="profile-card">
+    <div class="profile-glow" aria-hidden="true"></div>
+    <div class="large-avatar" aria-hidden="true">{{ store.initials() }}</div>
+    <div class="profile-copy">
+      <h2>{{ store.name() }}</h2>
+      <p>Todo en orden</p>
+    </div>
+    <button class="soft-button" type="button" (click)="editName()">Editar</button>
+  </section>
+
+  @if (editingName) {
+    <form class="inline-editor" (ngSubmit)="saveName()">
+      <label for="profile-name">Tu nombre</label>
+      <input id="profile-name" name="name" [(ngModel)]="name" maxlength="100" required />
+      <div class="editor-actions">
+        <button class="confirm-button" type="submit">Guardar</button
+        ><button class="cancel-button" type="button" (click)="editingName = false">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  <section class="profile-section account-section">
+    <div class="section-heading">
+      <div>
+        <span>Tu dinero</span>
+        <h2>Mi cuenta</h2>
+      </div>
+      <button class="edit-link" type="button" (click)="editAccount()">Editar</button>
+    </div>
+    <div class="account-card">
+      <div class="account-mark"><app-icon name="wallet" /></div>
+      <div class="account-copy">
+        <span>Saldo actual</span
+        ><strong>{{ store.formatMoney(store.accountBalance(store.account().id)) }}</strong>
+      </div>
+      <div class="account-state"><i></i> Al día</div>
+    </div>
+    @if (editingAccount) {
+      <form class="inline-editor account-editor" (ngSubmit)="saveAccount()">
+        <label for="opening-balance">Saldo inicial</label>
+        <div class="money-input">
+          <span>RD$</span
+          ><input
+            id="opening-balance"
+            name="openingBalance"
+            [(ngModel)]="openingBalance"
+            type="number"
+            step="0.01"
+            required
+          />
+        </div>
+        <small>El saldo que tenías antes de comenzar a registrar movimientos.</small>
+        <div class="editor-actions">
+          <button class="confirm-button" type="submit">Guardar</button
+          ><button class="cancel-button" type="button" (click)="editingAccount = false">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+
+  <section class="profile-section">
+    <div class="section-heading">
+      <div>
+        <span>A tu manera</span>
+        <h2>Preferencias</h2>
+      </div>
+    </div>
+    <div class="menu-card">
+      <button
+        class="menu-row"
+        type="button"
+        role="switch"
+        [attr.aria-checked]="store.hideBalances()"
+        (click)="store.toggleBalances()"
+      >
+        <span class="menu-icon mint"
+          ><app-icon [name]="store.hideBalances() ? 'eye-off' : 'eye'"
+        /></span>
+        <span class="menu-copy"
+          ><strong>Ocultar montos</strong><small>Más privacidad al abrir la app</small></span
+        >
+        <i class="toggle" [class.on]="store.hideBalances()" aria-hidden="true"><b></b></i>
+      </button>
+      <div class="menu-row future-row">
+        <span class="menu-icon lilac"><app-icon name="notifications" /></span>
+        <span class="menu-copy"
+          ><strong>Notificaciones</strong><small>Avisos y recordatorios</small></span
+        >
+        <span class="soon-pill">Próximamente</span>
+      </div>
+      <div class="menu-row future-row">
+        <span class="menu-icon peach"><app-icon name="fingerprint" /></span>
+        <span class="menu-copy"><strong>Face ID</strong><small>Acceso rápido y seguro</small></span>
+        <span class="soon-pill">Próximamente</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-section">
+    <div class="section-heading">
+      <div>
+        <span>Estamos contigo</span>
+        <h2>Más de Bolsillo</h2>
+      </div>
+    </div>
+    <div class="menu-card">
+      <button
+        class="menu-row link-row"
+        type="button"
+        [attr.aria-expanded]="helpOpen"
+        (click)="helpOpen = !helpOpen"
+      >
+        <span class="menu-icon sky"><app-icon name="help" /></span>
+        <span class="menu-copy"
+          ><strong>Centro de ayuda</strong><small>Respuestas rápidas</small></span
+        >
+        <app-icon class="chevron" [name]="helpOpen ? 'up' : 'chevron'" />
+      </button>
+      @if (helpOpen) {
+        <div class="help-panel">
+          <p><strong>¿Cómo se calcula el saldo?</strong> Saldo inicial + ingresos − gastos.</p>
+          <p><strong>¿Dónde están mis datos?</strong> Se guardan en este dispositivo.</p>
+        </div>
+      }
+      <button class="menu-row link-row" type="button" (click)="inviteFriend()">
+        <span class="menu-icon rose"><app-icon name="invite" /></span>
+        <span class="menu-copy"
+          ><strong>Invitar a un amigo</strong><small>Comparte Bolsillo</small></span
+        >
+        <app-icon class="chevron" name="chevron" />
+      </button>
+    </div>
+  </section>
+
+  <section class="profile-section backup-section">
+    <div class="backup-card">
+      <div class="backup-orb" aria-hidden="true"></div>
+      <span class="backup-icon"><app-icon name="cloud" /></span>
+      <div class="backup-copy">
+        <span>TUS DATOS</span>
+        <h2>Siempre contigo</h2>
+        <p>Guarda una copia privada cuando quieras.</p>
+      </div>
+      <button class="backup-primary" type="button" (click)="exportBackup()">
+        <app-icon name="download" /> Crear copia
+      </button>
+      <label class="restore-link" [class.disabled]="importing"
+        >Recuperar datos<input
+          type="file"
+          accept=".json,application/json"
+          [disabled]="importing"
+          (change)="selectBackup($event)"
+      /></label>
+    </div>
+    @if (pendingBackup) {
+      <div class="restore-confirmation">
+        <span class="menu-icon lilac"><app-icon name="cloud" /></span>
+        <div>
+          <strong>{{ backupName }}</strong>
+          <p>Esta copia reemplazará los datos actuales.</p>
+        </div>
+        <div class="editor-actions">
+          <button class="confirm-button" type="button" (click)="restore()">Recuperar</button
+          ><button class="cancel-button" type="button" (click)="pendingBackup = ''">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  @if (formError) {
+    <p class="profile-error" role="alert">{{ formError }}</p>
+  }
+  <footer>
+    <span class="brand-mark">B</span><strong>Bolsillo</strong><small>Tu dinero. A tu ritmo.</small>
+  </footer>
+</div>

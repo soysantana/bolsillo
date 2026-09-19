@@ -1,0 +1,269 @@
+<div class="page plan-page">
+  <header class="page-header">
+    <div><h1>Tu plan</h1></div>
+  </header>
+  <app-month-navigation [value]="store.selectedMonth()" (valueChange)="changeMonth($event)" />
+  <section class="plan-hero">
+    <span class="eyebrow">CATEGORÍAS PRESUPUESTADAS</span>
+    <div class="hero-value">
+      <strong>{{ store.formatMoney(store.budgetSpent()) }}</strong
+      ><small>de {{ store.formatMoney(store.budgetLimit()) }}</small>
+    </div>
+    @if (store.budgetLimit()) {
+      <div class="main-progress" aria-hidden="true">
+        <i [style.width.%]="progress(store.budgetSpent(), store.budgetLimit())"></i>
+      </div>
+      <div class="hero-footer">
+        <span>{{ percentage(store.budgetSpent(), store.budgetLimit()) }}% utilizado</span
+        ><b>{{ store.formatMoney(store.budgetLimit() - store.budgetSpent()) }} restantes</b>
+      </div>
+    } @else {
+      <p>Define tus límites mensuales por categoría.</p>
+    }
+  </section>
+  <section class="categories-section">
+    <div class="section-title">
+      <div><h2>Presupuesto por categoría</h2></div>
+    </div>
+    <p class="section-description">
+      Los límites se repiten cada mes. Cero significa sin límite definido.
+    </p>
+    <div class="budget-list">
+      @for (budget of store.budgets(); track budget.name) {
+        <article class="budget-row">
+          <app-category-icon [icon]="budget.icon" [color]="budget.color" />
+          <div class="budget-content">
+            <div class="budget-heading">
+              <h3>{{ budget.name }}</h3>
+              <button
+                class="text-button"
+                type="button"
+                [attr.aria-label]="'Ajustar presupuesto de ' + budget.name"
+                (click)="editBudget(budget)"
+              >
+                Ajustar
+              </button>
+            </div>
+            @if (budget.limit) {
+              <div class="budget-progress" aria-hidden="true">
+                <i
+                  [style.width.%]="progress(budget.spent, budget.limit)"
+                  [class.warning]="budget.spent > budget.limit * 0.75"
+                ></i>
+              </div>
+              <p>
+                <strong>{{ store.formatMoney(budget.spent) }}</strong> de
+                {{ store.formatMoney(budget.limit) }} ·
+                {{ percentage(budget.spent, budget.limit) }}%
+              </p>
+              @if (budget.spent > budget.limit) {
+                <p class="over-budget">
+                  Excedido por {{ store.formatMoney(budget.spent - budget.limit) }}
+                </p>
+              }
+            } @else {
+              <p>{{ store.formatMoney(budget.spent) }} gastados · Sin límite</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+  <section class="goal-section">
+    <div class="section-title">
+      <div><h2>Metas de ahorro</h2></div>
+      <button type="button" (click)="addingGoal = !addingGoal">
+        <app-icon name="add" /> Crear meta
+      </button>
+    </div>
+    @if (addingGoal) {
+      <form class="editor-card" (ngSubmit)="saveGoal()">
+        <label
+          >Nombre<input
+            name="goalName"
+            [(ngModel)]="goalName"
+            placeholder="Ej. Fondo de emergencia"
+            maxlength="100"
+            required /></label
+        ><label
+          >Meta (RD$)<input
+            name="goalTarget"
+            [(ngModel)]="goalTarget"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+        /></label>
+        <div class="row-actions">
+          <button type="submit">Crear meta</button
+          ><button type="button" (click)="addingGoal = false">Cancelar</button>
+        </div>
+      </form>
+    }
+    @for (goal of store.goals(); track goal.id) {
+      <article class="goal-card">
+        <div class="goal-top">
+          <div class="plane"><app-icon name="goal" /></div>
+          <div>
+            <h3>{{ goal.name }}</h3>
+          </div>
+          <b>{{ percentage(store.goalSaved(goal.id), goal.target) }}%</b>
+        </div>
+        <div class="goal-progress" aria-hidden="true">
+          <i [style.width.%]="progress(store.goalSaved(goal.id), goal.target)"></i>
+        </div>
+        <div class="goal-footer">
+          <strong>{{ store.formatMoney(store.goalSaved(goal.id)) }}</strong
+          ><span>Meta {{ store.formatMoney(goal.target) }}</span>
+        </div>
+        <button
+          type="button"
+          [disabled]="store.goalSaved(goal.id) >= goal.target"
+          (click)="contributionGoal = goal.id; contributionAmount = null"
+        >
+          {{ store.goalSaved(goal.id) >= goal.target ? 'Meta completada' : 'Apartar dinero'
+          }}<app-icon name="add" />
+        </button>
+        <details class="contributions">
+          <summary>Ver aportes</summary>
+          @for (contribution of goal.contributions; track $index) {
+            <p>
+              {{ store.formatDate(contribution.date) }} ·
+              {{ store.formatMoney(contribution.amount) }}
+            </p>
+          } @empty {
+            <p>Aún no hay aportes.</p>
+          }
+        </details>
+        <button type="button" (click)="removingGoal = goal.id">
+          Eliminar meta y liberar reservas
+        </button>
+      </article>
+      @if (contributionGoal === goal.id) {
+        <form class="editor-card" (ngSubmit)="saveContribution()">
+          <label
+            >Aporte a {{ goal.name }} (RD$)<input
+              name="contribution"
+              [(ngModel)]="contributionAmount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              required
+          /></label>
+          <p>
+            Disponible: {{ store.formatMoney(store.available()) }}. Este aporte reserva dinero
+            dentro de tu saldo.
+          </p>
+          <div class="row-actions">
+            <button type="submit">Reservar aporte</button
+            ><button type="button" (click)="contributionGoal = null">Cancelar</button>
+          </div>
+        </form>
+      }
+      @if (removingGoal === goal.id) {
+        <div class="feedback">
+          <p>
+            ¿Eliminar “{{ goal.name }}” y liberar sus reservas? El historial de aportes de esta meta
+            se eliminará.
+          </p>
+          <div class="row-actions">
+            <button type="button" (click)="release(goal.id)">Eliminar meta</button
+            ><button type="button" (click)="removingGoal = null">Cancelar</button>
+          </div>
+        </div>
+      }
+    } @empty {
+      <p class="empty-state">Crea una meta para reservar parte de tu saldo.</p>
+    }
+  </section>
+  <section>
+    <div class="section-title">
+      <div><h2>Pagos pendientes</h2></div>
+      <button type="button" (click)="addingPayment = !addingPayment">
+        <app-icon name="add" /> Agregar
+      </button>
+    </div>
+    @if (addingPayment) {
+      <form class="editor-card" (ngSubmit)="savePayment()">
+        <label
+          >Descripción<input
+            name="paymentName"
+            [(ngModel)]="paymentName"
+            maxlength="100"
+            placeholder="Ej. Factura de internet"
+            required /></label
+        ><label
+          >Monto (RD$)<input
+            name="paymentAmount"
+            [(ngModel)]="paymentAmount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required /></label
+        ><label
+          >Vencimiento<input name="paymentDate" [(ngModel)]="paymentDate" type="date" required
+        /></label>
+        <div class="row-actions">
+          <button type="submit">Guardar pago</button
+          ><button type="button" (click)="addingPayment = false">Cancelar</button>
+        </div>
+      </form>
+    }
+    @for (payment of store.payments(); track payment.id) {
+      <article class="editor-card">
+        <h3>{{ payment.name }}</h3>
+        <p>{{ store.formatMoney(payment.amount) }} · {{ store.formatDate(payment.date) }}</p>
+        @if (payment.date < today) {
+          <p><strong class="over-budget">Vencido</strong></p>
+        }
+        <div class="row-actions">
+          <button type="button" (click)="pay(payment.id)">Registrar como pagado</button
+          ><button type="button" (click)="store.removePayment(payment.id)">Quitar pendiente</button>
+        </div>
+      </article>
+    } @empty {
+      <p class="empty-state">No tienes pagos pendientes registrados.</p>
+    }
+  </section>
+  @if (formError) {
+    <p class="feedback warning" role="alert">{{ formError }}</p>
+  }
+</div>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="!!budgetName"
+  (didDismiss)="cancelBudget()"
+  aria-label="Ajustar presupuesto"
+>
+  <ng-template>
+    <form class="compact-sheet" (ngSubmit)="saveBudget()">
+      <header class="dialog-header">
+        <h2>Ajustar presupuesto</h2>
+        <button type="button" aria-label="Cerrar" (click)="cancelBudget()">
+          <app-icon name="close" />
+        </button>
+      </header>
+      <label>
+        <span>{{ budgetName }}</span>
+        <input
+          name="budgetLimit"
+          [(ngModel)]="budgetLimit"
+          type="number"
+          min="0"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="0.00"
+          required
+        />
+      </label>
+      @if (budgetError) {
+        <p class="dialog-error" role="alert">{{ budgetError }}</p>
+      }
+      <div class="dialog-actions">
+        <button type="button" class="secondary" (click)="cancelBudget()">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </ng-template>
+</ion-modal>

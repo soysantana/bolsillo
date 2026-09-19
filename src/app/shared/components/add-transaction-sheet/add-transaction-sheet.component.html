@@ -1,0 +1,96 @@
+<header class="sheet-header">
+  <button class="icon-button" type="button" aria-label="Cerrar" (click)="close()">
+    <app-icon name="close" />
+  </button>
+  <div>
+    <p>{{ transaction ? 'Editar movimiento' : 'Nuevo movimiento' }}</p>
+    <h1>{{ kind() === 'expense' ? 'Registrar gasto' : 'Registrar ingreso' }}</h1>
+  </div>
+  <span class="header-spacer"></span>
+</header>
+<main class="sheet-content">
+  <div class="kind-switch" role="group" aria-label="Tipo de movimiento">
+    <button
+      type="button"
+      [class.active]="kind() === 'expense'"
+      [attr.aria-pressed]="kind() === 'expense'"
+      (click)="selectKind('expense')"
+    >
+      Gasto</button
+    ><button
+      type="button"
+      [class.active]="kind() === 'income'"
+      [attr.aria-pressed]="kind() === 'income'"
+      (click)="selectKind('income')"
+    >
+      Ingreso
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <label class="amount-field"
+      ><span>Monto</span>
+      <div>
+        <small>RD$</small
+        ><input
+          class="amount-input"
+          formControlName="amount"
+          type="number"
+          min="0.01"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="0.00"
+        />
+      </div>
+      @if (form.controls.amount.touched && form.controls.amount.invalid) {
+        <em>Escribe un monto mayor que cero.</em>
+      }
+    </label>
+    <section class="category-section">
+      <span class="field-label">Categoría</span>
+      <div class="category-scroll">
+        @for (category of categories; track category.name) {
+          <button
+            type="button"
+            class="category-option"
+            [class.selected]="form.controls.category.value === category.name"
+            [attr.aria-pressed]="form.controls.category.value === category.name"
+            (click)="selectCategory(category.name)"
+          >
+            <app-category-icon
+              [icon]="category.icon"
+              [color]="category.color"
+              size="small"
+            /><span>{{ category.name }}</span>
+          </button>
+        }
+      </div>
+    </section>
+    <label class="text-field"
+      ><span>Descripción</span
+      ><input
+        formControlName="merchant"
+        type="text"
+        maxlength="100"
+        [placeholder]="
+          kind() === 'expense' ? 'Ej. Compra del supermercado' : 'Ej. Nómina de septiembre'
+        "
+        autocomplete="off"
+    /></label>
+    @if (form.controls.merchant.touched && form.controls.merchant.invalid) {
+      <p class="feedback" role="alert">Escribe una descripción de hasta 100 caracteres.</p>
+    }
+    <div class="form-grid single-field">
+      <label>Fecha<input formControlName="date" type="date" [max]="today" /></label>
+    </div>
+    @if (form.controls.date.touched && form.controls.date.invalid) {
+      <p class="feedback" role="alert">Selecciona la fecha del movimiento.</p>
+    }
+    @if (error()) {
+      <p class="feedback" role="alert">{{ error() }}</p>
+    }
+    <button class="save-button" type="submit" [disabled]="saving()">
+      {{ saving() ? 'Guardando…' : transaction ? 'Guardar cambios' : 'Guardar movimiento'
+      }}<app-icon name="check" />
+    </button>
+  </form>
+</main>

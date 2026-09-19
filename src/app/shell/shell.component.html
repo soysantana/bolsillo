@@ -1,0 +1,53 @@
+<div class="device-shell">
+  <ion-content fullscreen class="page-viewport">
+    <router-outlet></router-outlet>
+  </ion-content>
+
+  <div class="notification-stack">
+    @if (store.notice()) {
+      <div class="app-message" role="status">
+        <span>{{ store.notice() }}</span
+        ><button type="button" aria-label="Cerrar aviso" (click)="store.notice.set('')">
+          <app-icon name="close" />
+        </button>
+      </div>
+    }
+    @if (store.error()) {
+      <div class="app-message error" role="alert">
+        <span>{{ store.error() }}</span
+        ><button type="button" aria-label="Cerrar error" (click)="store.error.set('')">
+          <app-icon name="close" />
+        </button>
+      </div>
+    }
+  </div>
+
+  <nav id="main-navigation" class="bottom-nav" aria-label="Navegación principal">
+    <a routerLink="/inicio" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <app-icon name="home" />
+      <small>Inicio</small>
+    </a>
+    <a routerLink="/movimientos" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <app-icon name="activity" />
+      <small>Movimientos</small>
+    </a>
+
+    <button
+      class="add-button"
+      type="button"
+      aria-label="Registrar movimiento"
+      (click)="openAddTransaction()"
+    >
+      <app-icon name="add" />
+    </button>
+
+    <a routerLink="/plan" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <app-icon name="goal" />
+      <small>Plan</small>
+    </a>
+    <a routerLink="/perfil" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <app-icon name="profile" />
+      <small>Perfil</small>
+    </a>
+  </nav>
+</div>
