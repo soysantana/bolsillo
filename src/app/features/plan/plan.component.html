@@ -70,113 +70,19 @@
     </div>
   </section>
   <section class="goal-section">
-    <div class="section-title">
+    <div class="section-title goal-title">
       <div><h2>Metas de ahorro</h2></div>
-      <button type="button" (click)="addingGoal = !addingGoal">
-        <app-icon name="add" /> Crear meta
-      </button>
+      <span class="soon-badge">Próximamente</span>
     </div>
-    @if (addingGoal) {
-      <form class="editor-card" (ngSubmit)="saveGoal()">
-        <label
-          >Nombre<input
-            name="goalName"
-            [(ngModel)]="goalName"
-            placeholder="Ej. Fondo de emergencia"
-            maxlength="100"
-            required /></label
-        ><label
-          >Meta (RD$)<input
-            name="goalTarget"
-            [(ngModel)]="goalTarget"
-            type="number"
-            min="0.01"
-            step="0.01"
-            required
-        /></label>
-        <div class="row-actions">
-          <button type="submit">Crear meta</button
-          ><button type="button" (click)="addingGoal = false">Cancelar</button>
-        </div>
-      </form>
-    }
-    @for (goal of store.goals(); track goal.id) {
-      <article class="goal-card">
-        <div class="goal-top">
-          <div class="plane"><app-icon name="goal" /></div>
-          <div>
-            <h3>{{ goal.name }}</h3>
-          </div>
-          <b>{{ percentage(store.goalSaved(goal.id), goal.target) }}%</b>
-        </div>
-        <div class="goal-progress" aria-hidden="true">
-          <i [style.width.%]="progress(store.goalSaved(goal.id), goal.target)"></i>
-        </div>
-        <div class="goal-footer">
-          <strong>{{ store.formatMoney(store.goalSaved(goal.id)) }}</strong
-          ><span>Meta {{ store.formatMoney(goal.target) }}</span>
-        </div>
-        <button
-          type="button"
-          [disabled]="store.goalSaved(goal.id) >= goal.target"
-          (click)="contributionGoal = goal.id; contributionAmount = null"
-        >
-          {{ store.goalSaved(goal.id) >= goal.target ? 'Meta completada' : 'Apartar dinero'
-          }}<app-icon name="add" />
-        </button>
-        <details class="contributions">
-          <summary>Ver aportes</summary>
-          @for (contribution of goal.contributions; track $index) {
-            <p>
-              {{ store.formatDate(contribution.date) }} ·
-              {{ store.formatMoney(contribution.amount) }}
-            </p>
-          } @empty {
-            <p>Aún no hay aportes.</p>
-          }
-        </details>
-        <button type="button" (click)="removingGoal = goal.id">
-          Eliminar meta y liberar reservas
-        </button>
-      </article>
-      @if (contributionGoal === goal.id) {
-        <form class="editor-card" (ngSubmit)="saveContribution()">
-          <label
-            >Aporte a {{ goal.name }} (RD$)<input
-              name="contribution"
-              [(ngModel)]="contributionAmount"
-              type="number"
-              min="0.01"
-              step="0.01"
-              required
-          /></label>
-          <p>
-            Disponible: {{ store.formatMoney(store.available()) }}. Este aporte reserva dinero
-            dentro de tu saldo.
-          </p>
-          <div class="row-actions">
-            <button type="submit">Reservar aporte</button
-            ><button type="button" (click)="contributionGoal = null">Cancelar</button>
-          </div>
-        </form>
-      }
-      @if (removingGoal === goal.id) {
-        <div class="feedback">
-          <p>
-            ¿Eliminar “{{ goal.name }}” y liberar sus reservas? El historial de aportes de esta meta
-            se eliminará.
-          </p>
-          <div class="row-actions">
-            <button type="button" (click)="release(goal.id)">Eliminar meta</button
-            ><button type="button" (click)="removingGoal = null">Cancelar</button>
-          </div>
-        </div>
-      }
-    } @empty {
-      <p class="empty-state">Crea una meta para reservar parte de tu saldo.</p>
-    }
+    <article class="coming-soon-card">
+      <div class="plane"><app-icon name="goal" /></div>
+      <div>
+        <h3>Próximamente</h3>
+        <p>Estamos preparando esta parte para que tus metas se vean mejor y sean más fáciles de manejar.</p>
+      </div>
+    </article>
   </section>
-  <section>
+  <section class="payments-section">
     <div class="section-title">
       <div><h2>Pagos pendientes</h2></div>
       <button type="button" (click)="addingPayment = !addingPayment">
@@ -210,15 +116,26 @@
       </form>
     }
     @for (payment of store.payments(); track payment.id) {
-      <article class="editor-card">
-        <h3>{{ payment.name }}</h3>
-        <p>{{ store.formatMoney(payment.amount) }} · {{ store.formatDate(payment.date) }}</p>
-        @if (payment.date < today) {
-          <p><strong class="over-budget">Vencido</strong></p>
-        }
-        <div class="row-actions">
-          <button type="button" (click)="pay(payment.id)">Registrar como pagado</button
-          ><button type="button" (click)="store.removePayment(payment.id)">Quitar pendiente</button>
+      <article class="payment-card">
+        <div class="payment-main">
+          <div class="calendar-day">
+            <span>{{ payment.date.slice(8, 10) }}</span>
+          </div>
+          <div class="payment-copy">
+            <div class="payment-heading">
+              <h3>{{ payment.name }}</h3>
+              @if (payment.date < today) {
+                <strong class="over-budget">Vencido</strong>
+              }
+            </div>
+            <p>{{ store.formatMoney(payment.amount) }} · {{ store.formatDate(payment.date) }}</p>
+          </div>
+        </div>
+        <div class="payment-actions">
+          <button type="button" (click)="pay(payment.id)">Registrar pago</button
+          ><button type="button" class="secondary" (click)="store.removePayment(payment.id)">
+            Quitar
+          </button>
         </div>
       </article>
     } @empty {

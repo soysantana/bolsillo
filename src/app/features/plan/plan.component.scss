@@ -114,6 +114,19 @@
   font-size: 12px;
   font-weight: 750;
 }
+.goal-title {
+  align-items: center;
+}
+.soon-badge {
+  background: #e8f2dc;
+  border: 1px solid #d6e6c6;
+  border-radius: 99px;
+  color: #315f3b;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 7px 10px;
+}
 .budget-list {
   background: var(--wallet-surface);
   border: 1px solid var(--wallet-line);
@@ -240,6 +253,26 @@
 .goal-card > button span {
   font-size: 15px;
 }
+.coming-soon-card {
+  align-items: center;
+  background: #1d211d;
+  border-radius: 25px;
+  color: white;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 43px minmax(0, 1fr);
+  padding: 17px;
+}
+.coming-soon-card h3 {
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+.coming-soon-card p {
+  color: #c8d0c4;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
 .upcoming {
   align-items: center;
   background: var(--wallet-surface);
@@ -334,4 +367,83 @@
 }
 .budget-row {
   grid-template-columns: 46px minmax(0, 1fr);
+}
+.payments-section {
+  min-width: 0;
+}
+.payment-card {
+  background: var(--wallet-surface);
+  border: 1px solid var(--wallet-line);
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  margin: 12px 0;
+  min-width: 0;
+  padding: 14px;
+}
+.payment-main {
+  align-items: center;
+  display: grid;
+  gap: 11px;
+  grid-template-columns: 43px minmax(0, 1fr);
+  min-width: 0;
+}
+.payment-copy {
+  min-width: 0;
+}
+.payment-heading {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.payment-heading h3 {
+  font-size: 15px;
+  line-height: 1.3;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.payment-heading strong {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.payment-copy p {
+  color: var(--wallet-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 4px 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.payment-actions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(82px, auto);
+}
+.payment-actions button {
+  background: #edf3e7;
+  border: 1px solid #d0ddc3;
+  border-radius: 12px;
+  color: #284f32;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  min-width: 0;
+  padding: 10px 12px;
+}
+.payment-actions .secondary {
+  background: #f7f7f2;
+  border-color: var(--wallet-line);
+  color: var(--wallet-muted);
+}
+@media (max-width: 360px) {
+  .payment-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .payment-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

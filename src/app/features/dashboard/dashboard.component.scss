@@ -96,10 +96,15 @@
 }
 .balance-card > strong {
   display: block;
-  font-size: clamp(35px, 10vw, 46px);
+  font-size: clamp(22px, 6.8vw, 42px);
+  font-variant-numeric: tabular-nums;
   font-weight: 720;
-  letter-spacing: -0.065em;
-  margin: 9px 0 5px;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  margin: 11px 0 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .balance-card > p {
   color: #d6e4c9;
@@ -128,6 +133,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
+  min-width: 0;
 }
 .balance-footer small {
   color: #90988d;
@@ -135,7 +141,11 @@
 }
 .balance-footer b {
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
   font-weight: 650;
+  line-height: 1.25;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .balance-footer > i {
   background: #ffffff1c;
@@ -332,6 +342,16 @@
 }
 .balance-footer b {
   overflow-wrap: anywhere;
+}
+@media (max-width: 380px) {
+  .balance-footer {
+    align-items: start;
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .balance-footer > i {
+    display: none;
+  }
 }
 .section-title a {
   color: var(--wallet-positive);
