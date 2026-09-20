@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FinanceStore } from '../../core/services/finance-store.service';
 import { Budget, localDate } from '../../core/models/finance.models';
+import { PaymentReminderService } from '../../core/services/payment-reminder.service';
 @Component({
   selector: 'app-plan',
   standalone: false,
   templateUrl: './plan.component.html',
   styleUrl: './plan.component.scss',
 })
-export class PlanComponent {
+export class PlanComponent implements OnInit {
   budgetName = '';
   budgetLimit: number | null = 0;
   addingGoal = false;
@@ -23,7 +24,13 @@ export class PlanComponent {
   readonly today = localDate();
   formError = '';
   budgetError = '';
-  constructor(readonly store: FinanceStore) {}
+  constructor(
+    readonly store: FinanceStore,
+    private readonly reminders: PaymentReminderService,
+  ) {}
+  ngOnInit(): void {
+    void this.reminders.sync(this.store.payments());
+  }
   percentage(spent: number, limit: number): number {
     return limit > 0 ? Math.round((spent / limit) * 100) : 0;
   }
@@ -82,7 +89,8 @@ export class PlanComponent {
       this.store.notice.set('Meta eliminada. Sus reservas vuelven al saldo disponible.');
     }
   }
-  savePayment(): void {
+  async savePayment(): Promise<void> {
+    const existingIds = new Set(this.store.payments().map((payment) => payment.id));
     if (
       this.paymentAmount !== null &&
       this.store.addPayment(
@@ -96,11 +104,35 @@ export class PlanComponent {
       this.paymentName = '';
       this.paymentAmount = null;
       this.formError = '';
+      const payment = this.store.payments().find((item) => !existingIds.has(item.id));
+      if (!payment) {
+        this.store.notice.set('Pago guardado.');
+        return;
+      }
+      const result = await this.reminders.schedule(payment);
+      if (result === 'scheduled') {
+        this.store.notice.set('Pago guardado. Te avisaremos un día antes y el mismo día.');
+      } else if (result === 'denied') {
+        this.store.notice.set('Pago guardado sin recordatorio. Activa notificaciones en Ajustes.');
+      } else if (result === 'none') {
+        this.store.notice.set('Pago guardado. No hay recordatorios futuros para esa fecha.');
+      } else {
+        this.store.notice.set('Pago guardado.');
+      }
     } else
       this.formError =
         this.store.error() || 'Revisa el nombre, el monto, la fecha y la cuenta del pago.';
   }
-  pay(id: number): void {
-    if (this.store.pay(id)) this.store.notice.set('Pago registrado como gasto en Servicios.');
+  async pay(id: number): Promise<void> {
+    if (this.store.pay(id)) {
+      await this.reminders.cancel(id);
+      this.store.notice.set('Pago registrado como gasto en Servicios.');
+    }
+  }
+  async removePayment(id: number): Promise<void> {
+    if (this.store.removePayment(id)) {
+      await this.reminders.cancel(id);
+      this.store.notice.set('Pago pendiente eliminado.');
+    }
   }
 }

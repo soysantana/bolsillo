@@ -86,7 +86,7 @@ export class TransactionsComponent {
     });
     await this.undoToast.present();
   }
-  export(): void {
+  async export(): Promise<void> {
     const escape = (value: string | number) =>
       '"' +
       String(value)
@@ -103,11 +103,22 @@ export class TransactionsComponent {
         t.amount,
       ]),
     ];
-    downloadFile(
-      `bolsillo-${this.store.selectedMonth()}.csv`,
-      '\uFEFF' + rows.map((row) => row.map(escape).join(',')).join('\r\n'),
-      'text/csv;charset=utf-8',
-    );
-    this.store.notice.set('Se descargó el archivo con los movimientos filtrados.');
+    try {
+      const result = await downloadFile(
+        `bolsillo-${this.store.selectedMonth()}.csv`,
+        '\uFEFF' + rows.map((row) => row.map(escape).join(',')).join('\r\n'),
+        'text/csv;charset=utf-8',
+      );
+      this.store.notice.set(
+        result === 'opened'
+          ? 'Se abrió el archivo. Usa compartir o guardar archivo para conservarlo.'
+          : result === 'saved' || result === 'shared'
+            ? 'Archivo guardado en la carpeta Bolsillo. Puedes compartirlo cuando quieras.'
+            : 'Se descargó el archivo con los movimientos filtrados.',
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      this.store.notice.set('No pudimos crear el archivo. Inténtalo otra vez.');
+    }
   }
 }

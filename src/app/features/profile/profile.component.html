@@ -89,13 +89,19 @@
         >
         <i class="toggle" [class.on]="store.hideBalances()" aria-hidden="true"><b></b></i>
       </button>
-      <div class="menu-row future-row">
+      <button
+        class="menu-row link-row"
+        type="button"
+        role="switch"
+        [attr.aria-checked]="reminders.enabled()"
+        (click)="togglePaymentReminders()"
+      >
         <span class="menu-icon lilac"><app-icon name="notifications" /></span>
         <span class="menu-copy"
-          ><strong>Notificaciones</strong><small>Avisos y recordatorios</small></span
+          ><strong>Notificaciones</strong><small>Recordatorios de pagos pendientes</small></span
         >
-        <span class="soon-pill">Próximamente</span>
-      </div>
+        <i class="toggle" [class.on]="reminders.enabled()" aria-hidden="true"><b></b></i>
+      </button>
       <div class="menu-row future-row">
         <span class="menu-icon peach"><app-icon name="fingerprint" /></span>
         <span class="menu-copy"><strong>Face ID</strong><small>Acceso rápido y seguro</small></span>

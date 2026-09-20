@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FinanceStore } from '../../core/services/finance-store.service';
 import { localDate } from '../../core/models/finance.models';
+import { PaymentReminderService } from '../../core/services/payment-reminder.service';
 import { downloadFile } from '../../shared/download';
 @Component({
   selector: 'app-profile',
@@ -20,12 +21,31 @@ export class ProfileComponent {
   importing = false;
   constructor(
     readonly store: FinanceStore,
+    readonly reminders: PaymentReminderService,
     private readonly changeDetector: ChangeDetectorRef,
   ) {}
   editName(): void {
     this.name = this.store.name();
     this.editingName = true;
     this.formError = '';
+  }
+
+  async togglePaymentReminders(): Promise<void> {
+    if (this.reminders.enabled()) {
+      await this.reminders.disable(this.store.payments());
+      this.store.notice.set('Recordatorios de pagos desactivados.');
+      return;
+    }
+    const result = await this.reminders.enable(this.store.payments());
+    if (result === 'denied') {
+      this.store.notice.set(
+        'Activa las notificaciones de Bolsillo en Ajustes para recibir avisos.',
+      );
+    } else if (result === 'scheduled') {
+      this.store.notice.set('Recordatorios de pagos activados.');
+    } else {
+      this.store.notice.set('Recordatorios activados para tus próximos pagos.');
+    }
   }
   saveName(): void {
     if (this.store.updateName(this.name)) {
@@ -45,9 +65,25 @@ export class ProfileComponent {
     } else
       this.formError = this.store.error() || 'Escribe un saldo válido con hasta dos decimales.';
   }
-  exportBackup(): void {
-    downloadFile(`bolsillo-respaldo-${localDate()}.json`, this.store.backup(), 'application/json');
-    this.store.notice.set('Tu copia está lista. Guárdala en un lugar privado.');
+  async exportBackup(): Promise<void> {
+    this.formError = '';
+    try {
+      const result = await downloadFile(
+        `bolsillo-respaldo-${localDate()}.json`,
+        this.store.backup(),
+        'application/json',
+      );
+      this.store.notice.set(
+        result === 'opened'
+          ? 'Puedes compartirla o guardarla para no perderla.'
+          : result === 'saved' || result === 'shared'
+            ? 'Guardado en Bolsillo. ¡Puedes compartirlo cuando gustes!'
+            : 'Tu copia está lista. Guárdala en un lugar seguro.',
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      this.store.notice.set('No pudimos crear la copia. Inténtalo otra vez.');
+    }
   }
 
   async inviteFriend(): Promise<void> {
