@@ -54,6 +54,7 @@ export class PlanComponent implements OnInit {
     if (this.budgetLimit !== null && this.store.setBudget(this.budgetName, this.budgetLimit)) {
       this.cancelBudget();
       this.store.notice.set('Límite mensual actualizado.');
+      void this.reminders.checkBudgetAlerts(this.store.budgets());
     } else
       this.budgetError = this.store.error() || 'Escribe un límite válido, mayor o igual a cero.';
   }

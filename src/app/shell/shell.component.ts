@@ -1,6 +1,7 @@
 import { FinanceStore } from '../core/services/finance-store.service';
 import { Component, effect, inject } from '@angular/core';
 import { MobileViewportService } from '../core/services/mobile-viewport.service';
+import { PaymentReminderService } from '../core/services/payment-reminder.service';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { ModalController } from '@ionic/angular';
 import { AddTransactionSheetComponent } from '../shared/components/add-transaction-sheet/add-transaction-sheet.component';
@@ -15,8 +16,14 @@ export class ShellComponent {
   private readonly viewport = inject(MobileViewportService);
   constructor(
     readonly store: FinanceStore,
+    private readonly reminders: PaymentReminderService,
     private readonly modalController: ModalController,
   ) {
+    void this.reminders.sync(
+      this.store.payments(),
+      this.store.transactions(),
+      this.store.budgets(),
+    );
     effect((onCleanup) => {
       const message = this.store.notice();
       if (!message) return;

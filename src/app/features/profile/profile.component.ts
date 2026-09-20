@@ -36,7 +36,11 @@ export class ProfileComponent {
       this.store.notice.set('Recordatorios de pagos desactivados.');
       return;
     }
-    const result = await this.reminders.enable(this.store.payments());
+    const result = await this.reminders.enable(
+      this.store.payments(),
+      this.store.transactions(),
+      this.store.budgets(),
+    );
     if (result === 'denied') {
       this.store.notice.set(
         'Activa las notificaciones de Bolsillo en Ajustes para recibir avisos.',

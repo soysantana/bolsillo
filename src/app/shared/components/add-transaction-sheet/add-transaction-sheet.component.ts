@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ModalController } from '@ionic/angular';
 import { FinanceStore } from '../../../core/services/finance-store.service';
+import { PaymentReminderService } from '../../../core/services/payment-reminder.service';
 import {
   EXPENSE_CATEGORIES,
   INCOME_CATEGORIES,
@@ -20,6 +21,7 @@ export class AddTransactionSheetComponent implements OnInit {
   @Input() transaction?: Transaction;
   private readonly formBuilder = inject(FormBuilder);
   private readonly modalController = inject(ModalController);
+  private readonly reminders = inject(PaymentReminderService);
   readonly store = inject(FinanceStore);
   readonly kind = signal<TransactionKind>('expense');
   readonly today = localDate();
@@ -76,6 +78,8 @@ export class AddTransactionSheetComponent implements OnInit {
       this.saving.set(false);
       return;
     }
+    void this.reminders.scheduleInactivityReminder(this.store.transactions());
+    void this.reminders.checkBudgetAlerts(this.store.budgets());
     this.store.notice.set(this.transaction ? 'Movimiento actualizado.' : 'Movimiento guardado.');
     void Haptics.notification({ type: NotificationType.Success }).catch(() => undefined);
     await this.modalController.dismiss({ created: true });
