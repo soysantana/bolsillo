@@ -98,10 +98,21 @@
       >
         <span class="menu-icon lilac"><app-icon name="notifications" /></span>
         <span class="menu-copy"
-          ><strong>Notificaciones</strong><small>Recordatorios de pagos pendientes</small></span
+          ><strong>Notificaciones</strong
+          ><small>Avisos de pagos, presupuesto y actividad</small></span
         >
         <i class="toggle" [class.on]="reminders.enabled()" aria-hidden="true"><b></b></i>
       </button>
+      @if (reminders.enabled() && reminders.blockedBySystem()) {
+        <div class="menu-row settings-alert" role="note">
+          <span class="menu-icon amber"><app-icon name="alert" /></span>
+          <span class="menu-copy"
+            ><strong>Activa desde Ajustes</strong
+            ><small>Las notificaciones están desactivadas. Puedes activarlas desde Ajustes > Bolsillo.</small></span
+          >
+          <button type="button" (click)="openNotificationSettings()">Ir a Ajustes</button>
+        </div>
+      }
       <div class="menu-row future-row">
         <span class="menu-icon peach"><app-icon name="fingerprint" /></span>
         <span class="menu-copy"><strong>Face ID</strong><small>Acceso rápido y seguro</small></span>

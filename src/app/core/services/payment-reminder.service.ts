@@ -1,5 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
+import { AppLauncher } from '@capacitor/app-launcher';
 import { Capacitor } from '@capacitor/core';
+import type { PermissionState } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Budget, Payment, Transaction, localDate } from '../models/finance.models';
 
@@ -12,6 +14,9 @@ const INACTIVITY_ID = 2_100_000_002;
 @Injectable({ providedIn: 'root' })
 export class PaymentReminderService {
   readonly enabled = signal(localStorage.getItem(REMINDERS_KEY) === 'true');
+  readonly permission = signal<PermissionState | 'unavailable'>('unavailable');
+  readonly active = computed(() => this.enabled() && this.permission() === 'granted');
+  readonly blockedBySystem = computed(() => this.permission() === 'denied');
   private readonly reminderHours = [
     { offsetDays: -1, hour: 18, label: 'mañana' },
     { offsetDays: 0, hour: 9, label: 'hoy' },
@@ -52,8 +57,8 @@ export class PaymentReminderService {
     if (!this.enabled()) return;
     if (!this.available()) return;
     try {
-      const permissions = await LocalNotifications.checkPermissions();
-      if (permissions.display !== 'granted') return;
+      const permission = await this.refreshPermissionStatus();
+      if (permission !== 'granted') return;
       await Promise.all([
         ...payments.map((payment) => this.schedule(payment).catch(() => undefined)),
         this.scheduleWeeklySummary().catch(() => undefined),
@@ -88,8 +93,6 @@ export class PaymentReminderService {
     if (!this.available()) return 'unavailable';
     const granted = await this.ensurePermission();
     if (!granted) {
-      this.enabled.set(false);
-      localStorage.setItem(REMINDERS_KEY, 'false');
       return 'denied';
     }
     const results = await Promise.all([
@@ -100,8 +103,6 @@ export class PaymentReminderService {
     ]);
     if (results.includes('scheduled')) return 'scheduled';
     if (results.includes('denied')) {
-      this.enabled.set(false);
-      localStorage.setItem(REMINDERS_KEY, 'false');
       return 'denied';
     }
     return results[0] ?? 'none';
@@ -114,6 +115,31 @@ export class PaymentReminderService {
       ...payments.map((payment) => this.cancel(payment.id)),
       this.cancelByIds([WEEKLY_SUMMARY_ID, INACTIVITY_ID]),
     ]);
+  }
+
+  async refreshPermissionStatus(): Promise<PermissionState | 'unavailable'> {
+    if (!this.available()) {
+      this.permission.set('unavailable');
+      return 'unavailable';
+    }
+    try {
+      const permissions = await LocalNotifications.checkPermissions();
+      this.permission.set(permissions.display);
+      return permissions.display;
+    } catch {
+      this.permission.set('unavailable');
+      return 'unavailable';
+    }
+  }
+
+  async openSystemSettings(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('AppLauncher')) return false;
+    try {
+      const result = await AppLauncher.openUrl({ url: 'app-settings:' });
+      return result.completed;
+    } catch {
+      return false;
+    }
   }
 
   async scheduleInactivityReminder(transactions: Transaction[]): Promise<PaymentReminderResult> {
@@ -217,8 +243,10 @@ export class PaymentReminderService {
 
   private async ensurePermission(): Promise<boolean> {
     const current = await LocalNotifications.checkPermissions();
+    this.permission.set(current.display);
     if (current.display === 'granted') return true;
     const requested = await LocalNotifications.requestPermissions();
+    this.permission.set(requested.display);
     return requested.display === 'granted';
   }
 

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import {
   addOutline,
+  alertCircleOutline,
   arrowDownCircleOutline,
   arrowForwardOutline,
   barChartOutline,
@@ -33,6 +34,7 @@ import {
 } from 'ionicons/icons';
 const icons: Record<string, string> = {
   add: addOutline,
+  alert: alertCircleOutline,
   income: arrowDownCircleOutline,
   spark: arrowDownCircleOutline,
   arrow: arrowForwardOutline,

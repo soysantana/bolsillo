@@ -46,12 +46,12 @@ describe('Finance screens', () => {
     }).compileComponents();
   });
   afterEach(() => localStorage.clear());
-  it('presents Face ID as upcoming while notifications are available for payment reminders', async () => {
+  it('presents Face ID as upcoming while notifications are available', async () => {
     const fixture = TestBed.createComponent(ProfileComponent);
     await fixture.whenStable();
     const futureRows = fixture.nativeElement.querySelectorAll('.future-row');
     expect(futureRows).toHaveLength(1);
-    expect(fixture.nativeElement.textContent).toContain('Recordatorios de pagos pendientes');
+    expect(fixture.nativeElement.textContent).toContain('Avisos de pagos, presupuesto y actividad');
     expect(futureRows[0].textContent).toContain('Face ID');
     expect(futureRows[0].textContent).toContain('Próximamente');
     expect(futureRows[0].querySelector('button, input, [role="switch"]')).toBeNull();

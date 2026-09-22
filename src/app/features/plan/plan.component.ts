@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FinanceStore } from '../../core/services/finance-store.service';
-import { Budget, localDate } from '../../core/models/finance.models';
+import { Budget, Payment, localDate } from '../../core/models/finance.models';
 import { PaymentReminderService } from '../../core/services/payment-reminder.service';
 @Component({
   selector: 'app-plan',
@@ -21,6 +21,7 @@ export class PlanComponent implements OnInit {
   paymentName = '';
   paymentAmount: number | null = null;
   paymentDate = localDate();
+  removingPayment: Payment | null = null;
   readonly today = localDate();
   formError = '';
   budgetError = '';
@@ -90,6 +91,17 @@ export class PlanComponent implements OnInit {
       this.store.notice.set('Meta eliminada. Sus reservas vuelven al saldo disponible.');
     }
   }
+  openPaymentModal(): void {
+    this.addingPayment = true;
+    this.formError = '';
+  }
+  cancelPaymentModal(): void {
+    this.addingPayment = false;
+    this.paymentName = '';
+    this.paymentAmount = null;
+    this.paymentDate = localDate();
+    this.formError = '';
+  }
   async savePayment(): Promise<void> {
     const existingIds = new Set(this.store.payments().map((payment) => payment.id));
     if (
@@ -104,6 +116,7 @@ export class PlanComponent implements OnInit {
       this.addingPayment = false;
       this.paymentName = '';
       this.paymentAmount = null;
+      this.paymentDate = localDate();
       this.formError = '';
       const payment = this.store.payments().find((item) => !existingIds.has(item.id));
       if (!payment) {
@@ -132,8 +145,15 @@ export class PlanComponent implements OnInit {
   }
   async removePayment(id: number): Promise<void> {
     if (this.store.removePayment(id)) {
+      this.removingPayment = null;
       await this.reminders.cancel(id);
       this.store.notice.set('Pago pendiente eliminado.');
     }
+  }
+  requestRemovePayment(payment: Payment): void {
+    this.removingPayment = payment;
+  }
+  cancelRemovePayment(): void {
+    this.removingPayment = null;
   }
 }

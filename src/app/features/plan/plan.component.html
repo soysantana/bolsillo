@@ -88,36 +88,8 @@
   <section class="payments-section">
     <div class="section-title">
       <div><h2>Pagos pendientes</h2></div>
-      <button type="button" (click)="addingPayment = !addingPayment">
-        <app-icon name="add" /> Agregar
-      </button>
+      <button type="button" (click)="openPaymentModal()"><app-icon name="add" /> Agregar</button>
     </div>
-    @if (addingPayment) {
-      <form class="editor-card" (ngSubmit)="savePayment()">
-        <label
-          >Descripción<input
-            name="paymentName"
-            [(ngModel)]="paymentName"
-            maxlength="100"
-            placeholder="Ej. Factura de internet"
-            required /></label
-        ><label
-          >Monto (RD$)<input
-            name="paymentAmount"
-            [(ngModel)]="paymentAmount"
-            type="number"
-            min="0.01"
-            step="0.01"
-            required /></label
-        ><label
-          >Vencimiento<input name="paymentDate" [(ngModel)]="paymentDate" type="date" required
-        /></label>
-        <div class="row-actions">
-          <button type="submit">Guardar pago</button
-          ><button type="button" (click)="addingPayment = false">Cancelar</button>
-        </div>
-      </form>
-    }
     @for (payment of store.payments(); track payment.id) {
       <article class="payment-card">
         <div class="payment-main">
@@ -136,7 +108,7 @@
         </div>
         <div class="payment-actions">
           <button type="button" (click)="pay(payment.id)">Registrar pago</button
-          ><button type="button" class="secondary" (click)="removePayment(payment.id)">
+          ><button type="button" class="secondary" (click)="requestRemovePayment(payment)">
             Quitar
           </button>
         </div>
@@ -185,5 +157,87 @@
         <button type="submit" class="primary">Guardar</button>
       </div>
     </form>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="addingPayment"
+  (didDismiss)="cancelPaymentModal()"
+  aria-label="Agregar pago pendiente"
+>
+  <ng-template>
+    <form class="compact-sheet" (ngSubmit)="savePayment()">
+      <header class="dialog-header">
+        <h2>Agregar pago</h2>
+        <button type="button" aria-label="Cerrar" (click)="cancelPaymentModal()">
+          <app-icon name="close" />
+        </button>
+      </header>
+      <label>
+        <span>Descripción</span>
+        <input
+          name="paymentName"
+          [(ngModel)]="paymentName"
+          maxlength="100"
+          placeholder="Ej. Factura de internet"
+          autocomplete="off"
+          required
+        />
+      </label>
+      <label>
+        <span>Monto (RD$)</span>
+        <input
+          name="paymentAmount"
+          [(ngModel)]="paymentAmount"
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          step="0.01"
+          placeholder="0.00"
+          required
+        />
+      </label>
+      <label>
+        <span>Vencimiento</span>
+        <input name="paymentDate" [(ngModel)]="paymentDate" type="date" required />
+      </label>
+      @if (formError) {
+        <p class="dialog-error" role="alert">{{ formError }}</p>
+      }
+      <div class="dialog-actions">
+        <button type="button" class="secondary" (click)="cancelPaymentModal()">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="!!removingPayment"
+  (didDismiss)="cancelRemovePayment()"
+  aria-label="Quitar pago pendiente"
+>
+  <ng-template>
+    <section class="compact-sheet">
+      <header class="dialog-header">
+        <h2>Quitar pago</h2>
+        <button type="button" aria-label="Cerrar" (click)="cancelRemovePayment()">
+          <app-icon name="close" />
+        </button>
+      </header>
+      @if (removingPayment; as payment) {
+        <p class="dialog-copy">
+          ¿Quieres quitar <strong>{{ payment.name }}</strong> de tus pagos pendientes?
+        </p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary" (click)="cancelRemovePayment()">Cancelar</button>
+          <button type="button" class="destructive" (click)="removePayment(payment.id)">
+            Quitar
+          </button>
+        </div>
+      }
+    </section>
   </ng-template>
 </ion-modal>

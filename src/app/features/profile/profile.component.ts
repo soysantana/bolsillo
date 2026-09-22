@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FinanceStore } from '../../core/services/finance-store.service';
 import { localDate } from '../../core/models/finance.models';
 import { PaymentReminderService } from '../../core/services/payment-reminder.service';
@@ -9,7 +9,7 @@ import { downloadFile } from '../../shared/download';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   editingName = false;
   name = '';
   editingAccount = false;
@@ -24,6 +24,9 @@ export class ProfileComponent {
     readonly reminders: PaymentReminderService,
     private readonly changeDetector: ChangeDetectorRef,
   ) {}
+  ngOnInit(): void {
+    void this.reminders.refreshPermissionStatus();
+  }
   editName(): void {
     this.name = this.store.name();
     this.editingName = true;
@@ -33,7 +36,7 @@ export class ProfileComponent {
   async togglePaymentReminders(): Promise<void> {
     if (this.reminders.enabled()) {
       await this.reminders.disable(this.store.payments());
-      this.store.notice.set('Recordatorios de pagos desactivados.');
+      this.store.notice.set('Notificaciones desactivadas.');
       return;
     }
     const result = await this.reminders.enable(
@@ -43,13 +46,22 @@ export class ProfileComponent {
     );
     if (result === 'denied') {
       this.store.notice.set(
-        'Activa las notificaciones de Bolsillo en Ajustes para recibir avisos.',
+        'Notificaciones permítelas en Ajustes del iPhone para recibir avisos.',
       );
     } else if (result === 'scheduled') {
-      this.store.notice.set('Recordatorios de pagos activados.');
+      this.store.notice.set('Notificaciones activadas.');
     } else {
-      this.store.notice.set('Recordatorios activados para tus próximos pagos.');
+      this.store.notice.set('Notificaciones activadas.');
     }
+  }
+
+  async openNotificationSettings(): Promise<void> {
+    const opened = await this.reminders.openSystemSettings();
+    this.store.notice.set(
+      opened
+        ? 'Activa las notificaciones de Bolsillo en Ajustes del iPhone.'
+        : 'Activa las notificaciones de Bolsillo desde Ajustes del iPhone.',
+    );
   }
   saveName(): void {
     if (this.store.updateName(this.name)) {
