@@ -154,6 +154,20 @@
         >
         <app-icon class="chevron" name="chevron" />
       </button>
+      <button class="menu-row link-row" type="button" (click)="feedbackOpen = true">
+        <span class="menu-icon mint"><app-icon name="mail" /></span>
+        <span class="menu-copy"
+          ><strong>Enviar sugerencia</strong><small>Cuéntanos qué mejorarías</small></span
+        >
+        <app-icon class="chevron" name="chevron" />
+      </button>
+      <button class="menu-row link-row" type="button" (click)="privacyOpen = true">
+        <span class="menu-icon lilac"><app-icon name="shield" /></span>
+        <span class="menu-copy"
+          ><strong>Privacidad</strong><small>Cómo cuidamos tus datos</small></span
+        >
+        <app-icon class="chevron" name="chevron" />
+      </button>
     </div>
   </section>
 
@@ -201,3 +215,78 @@
     <span class="brand-mark">B</span><strong>Bolsillo</strong><small>Tu dinero. A tu ritmo.</small>
   </footer>
 </div>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="feedbackOpen"
+  (didDismiss)="feedbackOpen = false"
+  aria-label="Enviar sugerencia"
+>
+  <ng-template>
+    <section class="compact-sheet feedback-sheet">
+      <header class="dialog-header">
+        <h2>Enviar sugerencia</h2>
+        <button type="button" aria-label="Cerrar" (click)="feedbackOpen = false">
+          <app-icon name="close" />
+        </button>
+      </header>
+      <p class="feedback-copy">Elige la vía que te resulte más cómoda.</p>
+      <div class="feedback-options">
+        <button type="button" (click)="openFeedback('whatsapp')">
+          <span class="menu-icon mint"><app-icon name="whatsapp" /></span>
+          <span><strong>WhatsApp</strong><small>Respuesta rápida</small></span>
+        </button>
+        <button type="button" (click)="openFeedback('instagram')">
+          <span class="menu-icon rose"><app-icon name="instagram" /></span>
+          <span><strong>Instagram</strong><small>DM a @soysantana2</small></span>
+        </button>
+        <button type="button" (click)="openFeedback('email')">
+          <span class="menu-icon sky"><app-icon name="mail" /></span>
+          <span><strong>Correo</strong><small>santana.inffo@gmail.com</small></span>
+        </button>
+      </div>
+    </section>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="compact-modal"
+  [isOpen]="privacyOpen"
+  (didDismiss)="privacyOpen = false"
+  aria-label="Aviso de privacidad"
+>
+  <ng-template>
+    <section class="compact-sheet privacy-sheet">
+      <header class="dialog-header">
+        <h2>Aviso de privacidad</h2>
+        <button type="button" aria-label="Cerrar" (click)="privacyOpen = false">
+          <app-icon name="close" />
+        </button>
+      </header>
+      <div class="privacy-copy">
+        <p>
+          Bolsillo te ayuda a registrar tus finanzas personales de forma manual. No conectamos con
+          bancos, no accedemos a tus cuentas bancarias y no vendemos tu información.
+        </p>
+        <p>
+          En esta versión, tus datos se guardan en este dispositivo o navegador. Si borras los datos
+          del navegador, cambias de dispositivo o desinstalas la app, podrías perder la información
+          si no creaste una copia.
+        </p>
+        <p>
+          La copia de respaldo puede incluir saldos, movimientos, pagos, presupuestos y metas con
+          montos reales. Guárdala en un lugar seguro.
+        </p>
+        <p>
+          Si nos envías una sugerencia, recibiremos el mensaje que escribas y el contacto que uses:
+          correo, Instagram o WhatsApp.
+        </p>
+        <p>Bolsillo no sustituye asesoría financiera profesional.</p>
+        <small>Última actualización: septiembre 2026</small>
+      </div>
+      <button class="confirm-button privacy-primary" type="button" (click)="privacyOpen = false">
+        Entendido
+      </button>
+    </section>
+  </ng-template>
+</ion-modal>

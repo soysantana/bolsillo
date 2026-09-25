@@ -1,9 +1,6 @@
 <div class="page transactions-page">
   <header class="page-header">
     <h1>Movimientos</h1>
-    <button type="button" aria-label="Exportar movimientos" (click)="export()">
-      <app-icon name="download" />
-    </button>
   </header>
   <app-month-navigation [value]="store.selectedMonth()" (valueChange)="changeMonth($event)" />
   <section class="month-summary">

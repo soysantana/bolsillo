@@ -15,6 +15,8 @@ export class ProfileComponent implements OnInit {
   editingAccount = false;
   openingBalance: number | null = 0;
   helpOpen = false;
+  feedbackOpen = false;
+  privacyOpen = false;
   formError = '';
   pendingBackup = '';
   backupName = '';
@@ -120,6 +122,39 @@ export class ProfileComponent implements OnInit {
       this.store.notice.set('No pudimos abrir las opciones para compartir.');
     }
   }
+
+  openFeedback(channel: 'email' | 'instagram' | 'whatsapp'): void {
+    const message = this.feedbackMessage();
+    const encodedMessage = encodeURIComponent(message);
+    this.feedbackOpen = false;
+    if (channel === 'email') {
+      window.location.href = `mailto:santana.inffo@gmail.com?subject=${encodeURIComponent('Feedback de Bolsillo')}&body=${encodedMessage}`;
+      return;
+    }
+    const url =
+      channel === 'whatsapp'
+        ? `https://wa.me/18094511877?text=${encodedMessage}`
+        : 'https://ig.me/m/soysantana2';
+    window.open(url, '_blank', 'noopener');
+  }
+
+  private feedbackMessage(): string {
+    return [
+      'Hola, quiero compartir este comentario sobre Bolsillo:',
+      '',
+      '',
+      '---',
+      `Plataforma: ${this.platformLabel()}`,
+    ].join('\n');
+  }
+
+  private platformLabel(): string {
+    const userAgent = navigator.userAgent;
+    if (/iPhone|iPad|iPod/i.test(userAgent)) return 'iOS web';
+    if (/Android/i.test(userAgent)) return 'Android web';
+    return 'Web';
+  }
+
   async selectBackup(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
