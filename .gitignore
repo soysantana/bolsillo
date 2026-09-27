@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/api
 
 # Node
 /node_modules
@@ -42,3 +43,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# agents and skills
+.agents/
+docs/
+skills-lock.json

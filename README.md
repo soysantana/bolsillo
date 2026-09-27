@@ -64,3 +64,20 @@ npm test -- --watch=false
 ```
 
 Las pruebas cubren cálculos, filtros mensuales, cuentas, reservas, pagos, edición/eliminación/deshacer, persistencia, migración, validación de respaldos y estados de interfaz.
+
+### Interfaz de acceso
+
+La entrada `/` abre `/login`. La interfaz incluye registro (`/register`),
+recuperación (`/forgot-password`), nueva contraseña (`/reset-password`) y
+verificación de correo (`/verify-email`). Los formularios validan los datos,
+usan el logo `B` de Bolsillo y mantienen una voz de producto lista para usuario
+final. La integración con `api/src/auth` queda pendiente. La opción
+**Explorar la app** abre la aplicación local existente en `/inicio`.
+
+### Prototipo de cuenta y seguridad
+
+Desde **Perfil → Cuenta y seguridad** se puede revisar Mi perfil, Seguridad, cambio de contraseña, dispositivos y sesiones, cierre de sesión y eliminación de cuenta. Son simulaciones con identidad ficticia; no se conectan con la API ni modifican los datos financieros locales. Usa datos de ejemplo, nunca contraseñas reales.
+
+Con `npm start`, abre `/dev/cuenta` para la galería de escenarios de acceso y seguridad. Cada escenario restaura los fixtures; los estados de carga quedan fijos para inspección y Atrás del navegador regresa a la galería. Los errores permiten reintentar. Recargar restaura el estado efímero. La compilación de producción excluye la ruta y el código de la galería mediante reemplazo de archivo.
+
+Las skills habituales están instaladas con skills.sh en `.agents/skills/`, con fuentes registradas en `skills-lock.json`. Consulta [.agents/skills/README.md](.agents/skills/README.md).
