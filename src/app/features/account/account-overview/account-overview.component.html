@@ -1,0 +1,55 @@
+<main class="account-page">
+  <a class="back" routerLink="/perfil"><span aria-hidden="true">←</span> Volver a Perfil</a>
+  <header>
+    <span class="eyebrow">CUENTA Y SEGURIDAD</span>
+    <h1>{{ screen === 'account' ? 'Mi perfil' : 'Seguridad' }}</h1>
+    <p>
+      {{
+        screen === 'account'
+          ? 'Los datos de tu cuenta de acceso.'
+          : 'Revisa cómo accedes a Bolsillo.'
+      }}
+    </p>
+  </header>
+  @if (screen === 'account') {
+    <section class="card identity">
+      <div class="avatar" aria-hidden="true">AG</div>
+      <h2>{{ demo.identity().name }}</h2>
+      <dl>
+        <dt>Nombre</dt>
+        <dd>{{ demo.identity().name }}</dd>
+        <dt>Correo electrónico</dt>
+        <dd>{{ demo.identity().email }}</dd>
+      </dl>
+      <span class="badge">{{
+        demo.identity().verified ? 'Correo verificado' : 'Verificación pendiente'
+      }}</span>
+      @if (!demo.identity().verified) {
+        <a
+          class="primary"
+          routerLink="/verify-email"
+          [state]="{ email: demo.identity().email, returnTo: paths.account }"
+          >Verificar correo <app-icon name="mail"
+        /></a>
+      }
+    </section>
+    <a class="row card" [routerLink]="paths.security"
+      ><app-icon name="shield" /><span
+        ><strong>Seguridad</strong><small>Contraseña y dispositivos</small></span
+      ><app-icon name="chevron"
+    /></a>
+  } @else {
+    <section class="card menu">
+      <a class="row" [routerLink]="paths.password"
+        ><app-icon name="shield" /><span
+          ><strong>Cambiar contraseña</strong><small>Elige una nueva contraseña</small></span
+        ><app-icon name="chevron" /></a
+      ><a class="row" [routerLink]="paths.sessions"
+        ><app-icon name="profile" /><span
+          ><strong>Dispositivos y sesiones</strong
+          ><small>Revisa dónde tienes sesión abierta</small></span
+        ><app-icon name="chevron"
+      /></a>
+    </section>
+  }
+</main>

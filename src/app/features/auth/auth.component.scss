@@ -1,0 +1,517 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+  scrollbar-width: none;
+  color: var(--wallet-ink);
+}
+:host::-webkit-scrollbar {
+  display: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.auth-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: #f4f4ee;
+}
+
+.auth-layout {
+  width: min(960px, 100%);
+  min-height: 680px;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1fr);
+  background: #fbfbf7;
+  border: 1px solid #e3e4dd;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px #2028150f;
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  padding: 34px;
+  background: #edf1e6;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--wallet-ink);
+  color: var(--wallet-accent);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.brand-dot {
+  display: none;
+}
+
+.story-content {
+  margin: auto 0;
+  max-width: 260px;
+}
+
+.eyebrow {
+  display: block;
+  color: #637058;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.story h2 {
+  max-width: 7ch;
+  margin: 0;
+  font-size: 50px;
+  font-weight: 650;
+  line-height: 1.04;
+}
+
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 34px 54px 28px;
+}
+
+.panel-top {
+  min-height: 36px;
+}
+
+.mobile-brand {
+  display: none;
+}
+
+.form-content {
+  width: 100%;
+  max-width: 390px;
+  margin: auto;
+  padding: 24px 0;
+  animation: page-enter 0.22s ease;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  margin-bottom: 18px;
+  color: #64705d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.section-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: #edf1e6;
+  color: #536645;
+  font-size: 21px;
+}
+
+.section-icon.compact {
+  display: none;
+}
+
+.lilac {
+  background: #f0eaf6;
+  color: #665078;
+}
+
+h1 {
+  margin: 8px 0 18px;
+  white-space: pre-line;
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.intro {
+  margin: -8px 0 22px;
+  color: var(--wallet-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.field {
+  margin-top: 14px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  gap: 10px;
+  padding-left: 14px;
+  border: 1px solid #dfe2d8;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.input-wrap > app-icon {
+  color: #87917e;
+  font-size: 17px;
+}
+
+.input-wrap:focus-within {
+  border-color: #617b4b;
+  box-shadow: 0 0 0 3px #c4f65b25;
+}
+
+.input-wrap input {
+  width: 100%;
+  min-width: 0;
+  padding: 14px 10px 14px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--wallet-ink);
+  font-size: 16px;
+}
+
+.input-wrap input:focus-visible {
+  outline: none !important;
+}
+
+input::placeholder {
+  color: #93988d;
+  font-size: 13px;
+}
+
+.visibility {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  align-self: stretch;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #737c69;
+}
+
+.invalid {
+  border-color: #b6543a;
+}
+
+.error {
+  display: block;
+  color: #a3432e;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.error:not(:empty) {
+  margin-top: 5px;
+}
+
+.forgot-row {
+  margin: 8px 0 14px;
+  text-align: right;
+}
+
+.forgot-row a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: #526a40;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.primary {
+  margin-top: 22px;
+  border: 1px solid var(--wallet-ink);
+  background: var(--wallet-ink);
+  color: #fff;
+  transition:
+    background 0.18s,
+    transform 0.18s;
+}
+
+.primary app-icon {
+  color: var(--wallet-accent);
+}
+
+.primary:hover {
+  background: #35422c;
+  transform: translateY(-1px);
+}
+
+.secondary {
+  border: 1px solid #dfe2d8;
+  background: transparent;
+}
+
+.secondary:hover {
+  background: #edf0e7;
+}
+
+.switch-screen {
+  margin: 18px 0 0;
+  color: #717767;
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.switch-screen a {
+  display: inline-block;
+  padding: 4px 0;
+  color: #354c27;
+  font-weight: 750;
+}
+
+.panel-footer {
+  display: none;
+}
+
+.password-rules {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 16px;
+  padding: 0;
+  list-style: none;
+  color: #727b68;
+  font-size: 11px;
+}
+
+.password-rules li {
+  display: flex;
+  gap: 7px;
+}
+
+.password-rules .met {
+  color: #347b50;
+}
+
+.form-error,
+.status-note {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #dce4d1;
+  border-radius: 10px;
+  background: #f0f3e9;
+  color: #516243;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.form-error {
+  border-color: #edc3ac;
+  background: #fff0e8;
+  color: #863f24;
+}
+
+.fine-note {
+  margin: 14px 0 0;
+  color: #747c6c;
+  font-size: 12px;
+  text-align: center;
+}
+
+.email-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e1e4dc;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.email-card div {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: #727b68;
+  font-size: 10px;
+}
+
+.email-card strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.email-card a {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  color: #5b6c4f;
+}
+
+.resend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: #747c6c;
+  font-size: 11px;
+}
+
+.resend button,
+.plain-button {
+  border: 0;
+  background: transparent;
+  color: #3c562d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.plain-button {
+  display: block;
+  margin: 12px auto 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 840px), (hover: none) and (pointer: coarse) {
+  :host {
+    display: block;
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-padding-block: 24px;
+    background: #fbfbf7;
+  }
+
+  .auth-page {
+    display: block;
+    min-height: 100%;
+    overflow: visible;
+    padding: 0;
+    background: #fbfbf7;
+  }
+
+  .auth-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .story {
+    display: none;
+  }
+
+  .form-panel {
+    width: 100%;
+    max-width: 484px;
+    min-width: 0;
+    margin-inline: auto;
+    padding:
+      calc(22px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px)))
+      calc(22px + var(--ion-safe-area-right, env(safe-area-inset-right, 0px)))
+      calc(28px + var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px)))
+      calc(22px + var(--ion-safe-area-left, env(safe-area-inset-left, 0px)));
+  }
+
+  .mobile-brand {
+    display: inline-flex;
+  }
+
+  .form-content {
+    max-width: none;
+    margin: 0;
+    padding: 32px 0 0;
+  }
+
+  h1 {
+    font-size: 29px;
+    overflow-wrap: anywhere;
+  }
+  .input-wrap input {
+    scroll-margin-block: 20px;
+  }
+}
+
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.back-link,
+.forgot-row a,
+.email-card a,
+.switch-screen a,
+.resend button,
+.plain-button {
+  min-height: 44px;
+}
+:focus-visible {
+  outline: 3px solid #527035;
+  outline-offset: 3px;
+}

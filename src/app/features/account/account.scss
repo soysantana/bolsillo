@@ -1,0 +1,383 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+  scrollbar-width: none;
+  color: var(--wallet-ink);
+  background: #f5f5ef;
+}
+:host::-webkit-scrollbar {
+  display: none;
+}
+:host(.account-sheet) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sheet-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 16px 20px;
+  text-align: center;
+}
+.sheet-header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.sheet-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--wallet-soft);
+  color: var(--wallet-ink);
+  font-size: 24px;
+}
+:host(.account-sheet) .account-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-top: 12px;
+}
+:host(.account-sheet) .account-page::-webkit-scrollbar {
+  display: none;
+}
+:host(.account-sheet) form.card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+* {
+  box-sizing: border-box;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+:focus-visible {
+  outline: 3px solid #527035;
+  outline-offset: 3px;
+}
+.account-page {
+  width: min(100%, 640px);
+  margin: auto;
+  padding: max(24px, env(safe-area-inset-top)) 22px max(40px, env(safe-area-inset-bottom));
+}
+.back {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #526346;
+}
+.deletion-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+:host(.account-sheet) .deletion-page {
+  min-height: 0;
+}
+.deletion-backup {
+  margin-top: auto;
+  padding-top: 32px;
+}
+.deletion-backup h2 {
+  border-top: 1px solid #c8d1bf;
+  padding-top: 24px;
+  font-size: 18px;
+}
+.deletion-backup p {
+  margin: 0;
+  font-size: 14px;
+}
+.deletion-page form.card {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+header {
+  margin-bottom: 26px;
+}
+.eyebrow {
+  color: #586749;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  font-weight: 750;
+}
+h1 {
+  margin: 10px 0;
+  font-size: clamp(28px, 5vw, 36px);
+  line-height: 1.15;
+}
+h2 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+p {
+  color: #5e6858;
+  line-height: 1.65;
+}
+.card {
+  padding: 24px;
+  border: 1px solid #e0e4d8;
+  border-radius: 18px;
+  background: #fffefa;
+  margin: 18px 0;
+}
+.avatar {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  background: #e6f2cb;
+  border-radius: 20px;
+  font-size: 24px;
+  font-weight: 750;
+  margin-bottom: 20px;
+}
+dl {
+  margin: 24px 0;
+}
+dt {
+  color: #63705a;
+  font-size: 13px;
+  margin-top: 22px;
+}
+dd {
+  margin: 6px 0;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.badge {
+  display: inline-block;
+  padding: 7px 10px;
+  background: #edf1e6;
+  color: #455b33;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  min-height: 80px;
+}
+.row span {
+  flex: 1;
+  min-width: 0;
+}
+.row strong,
+.row small {
+  display: block;
+}
+.row strong {
+  font-size: 15px;
+}
+.row small {
+  color: #65705c;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.row > app-icon {
+  font-size: 24px;
+  color: #526840;
+}
+.menu {
+  padding: 8px 22px;
+}
+.menu .row + .row {
+  border-top: 1px solid #e6e8df;
+}
+.danger-zone {
+  margin-top: 32px;
+}
+.primary,
+.secondary,
+.danger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid #263321;
+}
+.primary {
+  background: #263321;
+  color: white;
+}
+.secondary {
+  background: transparent;
+  color: #35472a;
+  border-color: #c8d1bf;
+}
+.danger {
+  background: #a23827;
+  border-color: #a23827;
+  color: white;
+}
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 14px 0 8px;
+}
+.input-wrap {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  gap: 10px;
+  padding-left: 14px;
+  border: 1px solid #dfe2d8;
+  border-radius: 10px;
+  background: #fff;
+}
+.input-wrap > app-icon {
+  color: #87917e;
+  font-size: 17px;
+}
+.input-wrap:focus-within {
+  border-color: #617b4b;
+  box-shadow: 0 0 0 3px #c4f65b25;
+}
+.input-wrap input {
+  width: 100%;
+  min-width: 0;
+  padding: 14px 10px 14px 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: var(--wallet-ink);
+}
+.input-wrap input:focus-visible {
+  outline: none !important;
+}
+.input-wrap input::placeholder {
+  color: #93988d;
+  font-size: 13px;
+}
+.visibility {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  border: 0;
+  min-width: 44px;
+  border-radius: 8px;
+  background: transparent;
+  color: #737c69;
+}
+.input-wrap.invalid {
+  border-color: #b6543a;
+}
+.input-wrap + .error {
+  display: block;
+  color: #a3432e;
+  font-size: 11px;
+  margin: 0;
+}
+.input-wrap + .error:not(:empty) {
+  margin-top: 5px;
+}
+.error {
+  color: #963524;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.notice {
+  padding: 14px;
+  border-radius: 10px;
+  background: #edf1e6;
+  line-height: 1.6;
+  color: #405633;
+}
+.notice.error {
+  background: #fff0e8;
+  color: #963524;
+}
+.rules {
+  padding: 0;
+  list-style: none;
+  color: #65705c;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.met {
+  color: #30673b;
+}
+.session {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.session > div {
+  flex: 1;
+  min-width: 0;
+}
+.session h2 {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+}
+.session p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+.session app-icon {
+  font-size: 26px;
+  color: #526346;
+}
+.success {
+  text-align: center;
+  padding: 32px 24px;
+}
+.success > app-icon {
+  font-size: 48px;
+  color: #526840;
+  margin-bottom: 20px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+@media (min-width: 768px) {
+  .account-page {
+    padding-top: 48px;
+  }
+}

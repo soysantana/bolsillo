@@ -116,6 +116,18 @@ export class PaymentReminderService {
       this.cancelByIds([WEEKLY_SUMMARY_ID, INACTIVITY_ID]),
     ]);
   }
+  async deleteLocalData(): Promise<void> {
+    this.enabled.set(false);
+    if (this.available()) {
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications.length) {
+        await LocalNotifications.cancel({ notifications: pending.notifications });
+      }
+      await LocalNotifications.removeAllDeliveredNotifications();
+    }
+    localStorage.removeItem(REMINDERS_KEY);
+    localStorage.removeItem(BUDGET_ALERTS_KEY);
+  }
 
   async refreshPermissionStatus(): Promise<PermissionState | 'unavailable'> {
     if (!this.available()) {

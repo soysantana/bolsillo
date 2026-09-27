@@ -1,0 +1,31 @@
+<main class="account-page">
+  <a class="back" routerLink="/perfil">← Volver a Perfil</a>
+  <header>
+    <span class="eyebrow">SOLO DESARROLLO</span>
+    <h1>Cuenta y seguridad</h1>
+    <p>
+      Demostración con datos ficticios. No se envían correos, no se autentican usuarios y no se
+      eliminan cuentas reales. No uses contraseñas reales.
+    </p>
+    <p>
+      Cada escenario reinicia los datos de ejemplo. Los estados de carga permanecen visibles para
+      poder revisarlos. Usa Atrás del navegador para volver a esta galería.
+    </p>
+  </header>
+  <button class="secondary" type="button" (click)="demo.reset(); resetNotice.hidden = false">
+    Reiniciar demostración
+  </button>
+  <p #resetNotice hidden role="status">Datos de ejemplo restaurados.</p>
+  @for (group of groups; track group.title) {
+    <section class="card">
+      <h2>{{ group.title }}</h2>
+      <div class="scenario-list">
+        @for (scenario of group.scenarios; track scenario.label) {
+          <button type="button" (click)="open(group.path, scenario)">
+            {{ scenario.label }} <span aria-hidden="true">→</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+</main>

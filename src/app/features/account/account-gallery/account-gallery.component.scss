@@ -1,0 +1,22 @@
+.scenario-list {
+  display: grid;
+  gap: 8px;
+}
+.scenario-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #dbe1d2;
+  border-radius: 8px;
+  background: #f4f6ef;
+  color: #34472a;
+  font: inherit;
+  cursor: pointer;
+}
+.scenario-list button:hover {
+  background: #e6f2cb;
+}

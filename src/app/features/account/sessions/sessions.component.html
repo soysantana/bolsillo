@@ -1,0 +1,62 @@
+<main class="account-page">
+  <a class="back" [routerLink]="paths.security">← Volver a seguridad</a>
+  <header>
+    <span class="eyebrow">TU ACCESO</span>
+    <h1>Dispositivos y sesiones</h1>
+    <p>Revisa los dispositivos donde tienes sesión abierta.</p>
+  </header>
+  @if (notice()) {
+    <p class="notice" role="status">{{ notice() }}</p>
+  }
+  @if (flow.state() === 'loading' && !pending()) {
+    <p class="notice" role="status">Cargando sesiones…</p>
+  } @else if (flow.error() && !pending()) {
+    <p class="notice error" role="alert">{{ flow.error() }}</p>
+    <button class="primary" (click)="retry()">Reintentar</button>
+  } @else {
+    @for (session of demo.sessions(); track session.id) {
+      <section class="card">
+        <div class="session">
+          <app-icon name="profile" />
+          <div>
+            <h2>{{ session.device }}</h2>
+            <p>{{ session.platform }}<br />{{ session.activity }}</p>
+            @if (session.current) {
+              <span class="badge">Este dispositivo</span>
+            }
+          </div>
+        </div>
+        <button
+          type="button"
+          class="secondary"
+          [attr.data-session]="session.id"
+          [attr.aria-label]="'Cerrar sesión en ' + session.device"
+          (click)="pending.set(session)"
+        >
+          Cerrar sesión
+        </button>
+      </section>
+    } @empty {
+      <section class="card">
+        <h2>No hay sesiones abiertas</h2>
+        <p>Los dispositivos aparecerán aquí cuando inicies sesión.</p>
+      </section>
+    }
+    @if (demo.sessions().length) {
+      <button type="button" class="secondary" data-close-all (click)="pending.set('all')">
+        Cerrar todas las sesiones
+      </button>
+    }
+  }
+</main>
+@if (pending()) {
+  <app-confirmation
+    title="¿Cerrar sesión?"
+    [description]="description"
+    [action]="pending() === 'all' ? 'Cerrar todas las sesiones' : 'Cerrar sesión'"
+    [busy]="flow.state() === 'loading'"
+    [error]="flow.error()"
+    (cancelled)="cancel()"
+    (confirmed)="confirm()"
+  />
+}

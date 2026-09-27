@@ -24,7 +24,7 @@
   box-sizing: border-box;
 }
 html {
-  background: #e8e6df;
+  background: var(--wallet-bg);
 }
 html,
 body {
@@ -39,6 +39,11 @@ body {
   font-family: var(--ion-font-family);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+}
+html,
+body,
+ion-app {
+  background-color: var(--wallet-bg);
 }
 button,
 a {

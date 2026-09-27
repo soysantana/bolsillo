@@ -58,6 +58,15 @@ describe('Finance screens', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Cuentas conectadas');
     expect(fixture.nativeElement.textContent).not.toContain('Agregar cuenta');
   });
+  it('keeps account access after preferences and logout as a header action', async () => {
+    const fixture = TestBed.createComponent(ProfileComponent);
+    await fixture.whenStable();
+    const text = fixture.nativeElement.textContent;
+    expect(text.indexOf('Preferencias')).toBeLessThan(text.indexOf('Cuenta y seguridad'));
+    expect(text.indexOf('Cuenta y seguridad')).toBeLessThan(text.indexOf('Más de Bolsillo'));
+    expect(fixture.nativeElement.querySelector('.profile-actions app-logout')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.menu-card app-logout')).toBeNull();
+  });
   it('updates the dashboard after the user saves their profile name', async () => {
     const fixture = TestBed.createComponent(ProfileComponent);
     await fixture.whenStable();

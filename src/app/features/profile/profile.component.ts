@@ -17,6 +17,8 @@ export class ProfileComponent implements OnInit {
   helpOpen = false;
   feedbackOpen = false;
   privacyOpen = false;
+  deleteAccountOpen = false;
+  deletingAccount = false;
   formError = '';
   pendingBackup = '';
   backupName = '';
@@ -47,9 +49,7 @@ export class ProfileComponent implements OnInit {
       this.store.budgets(),
     );
     if (result === 'denied') {
-      this.store.notice.set(
-        'Notificaciones permítelas en Ajustes del iPhone para recibir avisos.',
-      );
+      this.store.notice.set('Notificaciones permítelas en Ajustes del iPhone para recibir avisos.');
     } else if (result === 'scheduled') {
       this.store.notice.set('Notificaciones activadas.');
     } else {

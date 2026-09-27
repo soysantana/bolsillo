@@ -5,6 +5,9 @@
   padding: max(24px, env(safe-area-inset-top)) 16px 32px;
 }
 .profile-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
   padding: 2px 4px 20px;
 }
 .profile-header span,
@@ -17,6 +20,11 @@
   font-size: 30px;
   letter-spacing: -0.055em;
   margin: 3px 0 0;
+}
+.profile-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
 }
 
 .profile-card {
@@ -603,4 +611,9 @@ footer small {
     font-size: 8px;
     padding: 5px 6px;
   }
+}
+
+a.menu-row {
+  text-decoration: none;
+  color: inherit;
 }

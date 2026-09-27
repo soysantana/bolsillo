@@ -1,0 +1,263 @@
+@if (sheet()) {
+  <header class="sheet-header">
+    <button
+      class="sheet-close"
+      type="button"
+      aria-label="Cerrar"
+      [disabled]="deleting()"
+      (click)="closed.emit()"
+    >
+      <app-icon name="close" />
+    </button>
+    <h1>Eliminar cuenta</h1>
+  </header>
+}
+<main class="account-page" [class.deletion-page]="screen === 'delete'">
+  @if (!sheet()) {
+    <a class="back" [routerLink]="screen === 'delete' ? '/perfil' : paths.security"
+      >← {{ screen === 'delete' ? 'Volver a Perfil' : 'Volver a seguridad' }}</a
+    >
+  }
+  @if (flow.state() === 'success') {
+    <section class="card success" role="status">
+      <app-icon name="check" />
+      <h1>{{ screen === 'delete' ? 'Datos eliminados' : 'Contraseña actualizada' }}</h1>
+      <p>
+        {{
+          screen === 'delete'
+            ? 'Se eliminaron tus datos de Bolsillo de este dispositivo. Las copias que hayas guardado por tu cuenta siguen bajo tu control.'
+            : 'Ya puedes usar tu nueva contraseña para iniciar sesión.'
+        }}
+      </p>
+      <a
+        class="primary"
+        [routerLink]="screen === 'delete' ? '/login' : paths.security"
+        [state]="screen === 'delete' ? { exitReason: 'deleted' } : {}"
+        (click)="closed.emit()"
+        >{{ screen === 'delete' ? 'Volver a iniciar sesión' : 'Volver a seguridad' }}</a
+      >
+    </section>
+  } @else {
+    <header>
+      @if (!sheet()) {
+        <span class="eyebrow">CUENTA Y SEGURIDAD</span>
+        <h1>{{ screen === 'delete' ? 'Eliminar cuenta' : 'Cambiar contraseña' }}</h1>
+      }
+      <p>
+        {{
+          screen === 'delete'
+            ? 'Se eliminarán tu perfil y tus datos de Bolsillo de este dispositivo. Esta acción no se puede deshacer.'
+            : 'Elige una contraseña que solo uses en Bolsillo.'
+        }}
+      </p>
+    </header>
+    <form
+      class="card"
+      #form="ngForm"
+      (ngSubmit)="submit(form)"
+      novalidate
+      [attr.aria-busy]="flow.state() === 'loading'"
+    >
+      @if (screen === 'password') {
+        <label for="current">Contraseña actual</label>
+        <div class="input-wrap" [class.invalid]="submitted && !current">
+          <app-icon name="shield" />
+          <input
+            id="current"
+            placeholder="Tu contraseña"
+            name="current"
+            [(ngModel)]="current"
+            required
+            maxlength="128"
+            autocomplete="current-password"
+            [type]="visible.current ? 'text' : 'password'"
+            aria-describedby="current-error"
+            [attr.aria-invalid]="submitted && !current"
+            [disabled]="flow.state() === 'loading'"
+          /><button
+            class="visibility"
+            type="button"
+            (click)="visible.current = !visible.current"
+            [attr.aria-label]="
+              visible.current ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'
+            "
+            [attr.aria-pressed]="visible.current"
+          >
+            <app-icon [name]="visible.current ? 'eye-off' : 'eye'" />
+          </button>
+        </div>
+        <p id="current-error" class="error">
+          @if (submitted && !current) {
+            Escribe tu contraseña actual.
+          }
+          @if (flow.error()) {
+            {{ flow.error() }}
+          }
+        </p>
+      }
+      @if (screen === 'password') {
+        <label for="password">Nueva contraseña</label>
+        <div class="input-wrap" [class.invalid]="submitted && !passwordValid">
+          <app-icon name="shield" />
+          <input
+            id="password"
+            placeholder="Crea una contraseña segura"
+            name="password"
+            [(ngModel)]="password"
+            required
+            maxlength="128"
+            autocomplete="new-password"
+            [type]="visible.password ? 'text' : 'password'"
+            aria-describedby="password-rules password-error"
+            [attr.aria-invalid]="submitted && !passwordValid"
+            [disabled]="flow.state() === 'loading'"
+          /><button
+            class="visibility"
+            type="button"
+            (click)="visible.password = !visible.password"
+            [attr.aria-label]="
+              visible.password ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'
+            "
+            [attr.aria-pressed]="visible.password"
+          >
+            <app-icon [name]="visible.password ? 'eye-off' : 'eye'" />
+          </button>
+        </div>
+        <p id="password-error" class="error">
+          @if (submitted && !password) {
+            Escribe tu nueva contraseña.
+          }
+        </p>
+        <ul id="password-rules" class="rules">
+          @for (check of checks; track check.label) {
+            <li [class.met]="check.valid">
+              <span aria-hidden="true">{{ check.valid ? '✓' : '○' }}</span
+              ><span class="sr-only">{{ check.valid ? 'Cumplido: ' : 'Pendiente: ' }}</span>
+              {{ check.label }}
+            </li>
+          }
+        </ul>
+        <label for="confirmation">Confirma tu nueva contraseña</label>
+        <div
+          class="input-wrap"
+          [class.invalid]="submitted && (!confirmation || confirmation !== password)"
+        >
+          <app-icon name="shield" />
+          <input
+            id="confirmation"
+            placeholder="Escríbela una vez más"
+            name="confirmation"
+            [(ngModel)]="confirmation"
+            required
+            maxlength="128"
+            autocomplete="new-password"
+            [type]="visible.confirmation ? 'text' : 'password'"
+            aria-describedby="confirmation-error"
+            [attr.aria-invalid]="submitted && (!confirmation || confirmation !== password)"
+            [disabled]="flow.state() === 'loading'"
+          /><button
+            class="visibility"
+            type="button"
+            (click)="visible.confirmation = !visible.confirmation"
+            [attr.aria-label]="
+              visible.confirmation ? 'Ocultar confirmación' : 'Mostrar confirmación'
+            "
+            [attr.aria-pressed]="visible.confirmation"
+          >
+            <app-icon [name]="visible.confirmation ? 'eye-off' : 'eye'" />
+          </button>
+        </div>
+        <p id="confirmation-error" class="error">
+          @if (submitted && !confirmation) {
+            Confirma tu nueva contraseña.
+          } @else if (submitted && password !== confirmation) {
+            Las contraseñas no coinciden.
+          }
+        </p>
+      }
+      @if (validation) {
+        <p class="notice error" role="alert">{{ validation }}</p>
+      }
+      @if (flow.error()) {
+        <p class="notice error" role="alert">{{ flow.error() }} Inténtalo de nuevo.</p>
+      }
+      @if (flow.state() === 'loading') {
+        <p class="notice" role="status">
+          {{ screen === 'delete' ? 'Procesando…' : 'Guardando contraseña…' }}
+        </p>
+      }
+      <button type="submit" class="primary" [disabled]="flow.state() === 'loading' || exporting()">
+        {{ screen === 'delete' ? 'Eliminar cuenta' : 'Guardar contraseña' }}
+      </button>
+    </form>
+    @if (sheet()) {
+      <button class="secondary" type="button" [disabled]="deleting()" (click)="closed.emit()">
+        Cancelar
+      </button>
+    } @else {
+      <a class="secondary" [routerLink]="screen === 'delete' ? '/perfil' : paths.security">{{
+        screen === 'delete' ? 'Conservar mi cuenta' : 'Cancelar'
+      }}</a>
+    }
+    @if (screen === 'delete' && !preview) {
+      <section class="deletion-backup">
+        <h2>Guarda una copia</h2>
+        <p>Puedes guardar tus datos antes de eliminar tu cuenta.</p>
+        <button
+          class="secondary"
+          type="button"
+          [disabled]="exporting() || deleting()"
+          (click)="exportBackup()"
+        >
+          <app-icon name="download" /> {{ exporting() ? 'Preparando copia…' : 'Guardar una copia' }}
+        </button>
+        @if (backupMessage()) {
+          <p class="notice" role="status">{{ backupMessage() }}</p>
+        }
+      </section>
+    }
+  }
+</main>
+@if (confirming()) {
+  <app-confirmation
+    title="¿Eliminar tu cuenta?"
+    description="Se borrarán tu perfil, movimientos, saldos, presupuestos, metas y pagos de este dispositivo. Esta acción no se puede deshacer."
+    action="Eliminar mi cuenta"
+    [destructive]="true"
+    [busy]="flow.state() === 'loading'"
+    [error]="flow.error()"
+    (cancelled)="cancel()"
+    (confirmed)="save()"
+  >
+    <label for="deletion-password">Contraseña actual</label>
+    <div class="input-wrap" [class.invalid]="!!deletionPasswordError">
+      <app-icon name="shield" />
+      <input
+        id="deletion-password"
+        placeholder="Tu contraseña"
+        name="deletion-password"
+        [(ngModel)]="current"
+        [type]="visible.current ? 'text' : 'password'"
+        autocomplete="current-password"
+        maxlength="128"
+        required
+        [disabled]="deleting()"
+        aria-describedby="deletion-password-error"
+        [attr.aria-invalid]="!!deletionPasswordError"
+        (ngModelChange)="deletionPasswordError = ''"
+        (keydown.enter)="save()"
+      />
+      <button
+        class="visibility"
+        type="button"
+        [disabled]="deleting()"
+        [attr.aria-label]="visible.current ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        [attr.aria-pressed]="visible.current"
+        (click)="visible.current = !visible.current"
+      >
+        <app-icon [name]="visible.current ? 'eye-off' : 'eye'" />
+      </button>
+    </div>
+    <p id="deletion-password-error" class="error" role="alert">{{ deletionPasswordError }}</p>
+  </app-confirmation>
+}

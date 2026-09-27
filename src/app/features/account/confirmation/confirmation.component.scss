@@ -1,0 +1,62 @@
+dialog {
+  box-sizing: border-box;
+  width: min(440px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: 26px;
+  border: 1px solid #dbe1d2;
+  border-radius: 18px;
+  background: #fffefa;
+  color: #263321;
+  box-shadow: 0 24px 90px #18221135;
+}
+dialog::backdrop {
+  background: #1d271c66;
+}
+h2 {
+  margin: 0;
+  font-size: 23px;
+}
+p {
+  line-height: 1.65;
+  color: #5b6853;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+button {
+  flex: 1 1 140px;
+  min-height: 48px;
+  border: 1px solid #b9c5b0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 650;
+  padding: 12px;
+  cursor: pointer;
+}
+.cancel {
+  background: transparent;
+  color: #263321;
+}
+.confirm {
+  background: #263321;
+  color: white;
+}
+.destructive {
+  background: #a23827;
+  border-color: #a23827;
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+:focus-visible {
+  outline: 3px solid #597f35;
+  outline-offset: 3px;
+}
+.error {
+  color: #963524;
+}

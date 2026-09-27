@@ -332,6 +332,17 @@ export class FinanceStore {
   backup(): string {
     return JSON.stringify(this.data(), null, 2);
   }
+  deleteLocalData(): void {
+    // Remove legacy sources first so a later load cannot migrate deleted data back.
+    for (const key of ['bolsillo-transactions', 'bolsillo-budgets', KEY]) {
+      localStorage.removeItem(key);
+    }
+    this.data.set(this.fresh());
+    this.recoveryRequired = false;
+    this.selectedMonth.set(localDate().slice(0, 7));
+    this.notice.set('');
+    this.error.set('');
+  }
   importBackup(json: string): boolean {
     try {
       const value: unknown = JSON.parse(json);

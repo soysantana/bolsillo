@@ -1,0 +1,29 @@
+<dialog
+  #dialog
+  aria-labelledby="confirm-title"
+  aria-describedby="confirm-description"
+  (cancel)="cancel($event)"
+  (keydown)="containFocus($event)"
+>
+  <h2 id="confirm-title">{{ title() }}</h2>
+  <p id="confirm-description">{{ description() }}</p>
+  <ng-content />
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (busy()) {
+    <p role="status">Procesando…</p>
+  }
+  <div class="actions">
+    <button #cancelButton type="button" class="cancel" (click)="cancel()">Cancelar</button
+    ><button
+      type="button"
+      class="confirm"
+      [class.destructive]="destructive()"
+      [disabled]="busy()"
+      (click)="confirmed.emit()"
+    >
+      {{ busy() ? 'Procesando…' : action() }}
+    </button>
+  </div>
+</dialog>

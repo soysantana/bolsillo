@@ -1,7 +1,12 @@
 <div class="page profile-page">
   <header class="profile-header">
-    <span>Tu espacio</span>
-    <h1>Perfil</h1>
+    <div>
+      <span>Tu espacio</span>
+      <h1>Perfil</h1>
+    </div>
+    <div class="profile-actions">
+      <app-logout variant="icon" />
+    </div>
   </header>
 
   <section class="profile-card">
@@ -108,7 +113,10 @@
           <span class="menu-icon amber"><app-icon name="alert" /></span>
           <span class="menu-copy"
             ><strong>Activa desde Ajustes</strong
-            ><small>Las notificaciones están desactivadas. Puedes activarlas desde Ajustes > Bolsillo.</small></span
+            ><small
+              >Las notificaciones están desactivadas. Puedes activarlas desde Ajustes >
+              Bolsillo.</small
+            ></span
           >
           <button type="button" (click)="openNotificationSettings()">Ir a Ajustes</button>
         </div>
@@ -118,6 +126,36 @@
         <span class="menu-copy"><strong>Face ID</strong><small>Acceso rápido y seguro</small></span>
         <span class="soon-pill">Próximamente</span>
       </div>
+    </div>
+  </section>
+
+  <section class="profile-section">
+    <div class="section-heading">
+      <div>
+        <span>Tu acceso</span>
+        <h2>Cuenta y seguridad</h2>
+      </div>
+    </div>
+    <div class="menu-card">
+      <a class="menu-row link-row" routerLink="/perfil/cuenta"
+        ><span class="menu-icon mint"><app-icon name="profile" /></span
+        ><span class="menu-copy"
+          ><strong>Mi perfil</strong><small>Datos de tu cuenta de acceso</small></span
+        ><app-icon class="chevron" name="chevron"
+      /></a>
+      <a class="menu-row link-row" routerLink="/perfil/seguridad"
+        ><span class="menu-icon lilac"><app-icon name="shield" /></span
+        ><span class="menu-copy"
+          ><strong>Seguridad</strong><small>Contraseña y dispositivos</small></span
+        ><app-icon class="chevron" name="chevron"
+      /></a>
+      <button class="menu-row link-row" type="button" (click)="deleteAccountOpen = true">
+        <span class="menu-icon rose"><app-icon name="trash" /></span>
+        <span class="menu-copy"
+          ><strong>Eliminar cuenta</strong><small>Revisa antes de continuar</small></span
+        >
+        <app-icon class="chevron" name="chevron" />
+      </button>
     </div>
   </section>
 
@@ -217,6 +255,22 @@
 </div>
 
 <ion-modal
+  class="transaction-modal"
+  [isOpen]="deleteAccountOpen"
+  [canDismiss]="!deletingAccount"
+  (didDismiss)="deleteAccountOpen = false"
+  aria-label="Eliminar cuenta"
+>
+  <ng-template>
+    <app-security-form
+      [sheet]="true"
+      (busyChanged)="deletingAccount = $event"
+      (closed)="deleteAccountOpen = false"
+    />
+  </ng-template>
+</ion-modal>
+
+<ion-modal
   class="compact-modal"
   [isOpen]="feedbackOpen"
   (didDismiss)="feedbackOpen = false"
@@ -276,6 +330,11 @@
         <p>
           La copia de respaldo puede incluir saldos, movimientos, pagos, presupuestos y metas con
           montos reales. Guárdala en un lugar seguro.
+        </p>
+        <p>
+          Al confirmar la eliminación, se borran tu perfil y tus datos financieros de este
+          dispositivo, junto con sus recordatorios. Puedes guardar una copia antes de continuar. Las
+          copias que hayas guardado o compartido por tu cuenta siguen bajo tu control.
         </p>
         <p>
           Si nos envías una sugerencia, recibiremos el mensaje que escribas y el contacto que uses:
