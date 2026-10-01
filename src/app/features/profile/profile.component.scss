@@ -502,34 +502,95 @@
   line-height: 1.5;
   margin: 0;
 }
-.feedback-options {
+.feedback-form {
   display: grid;
-  gap: 9px;
+  gap: 13px;
 }
-.feedback-options button {
+.feedback-choice-group {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+}
+.feedback-choice-group legend,
+.feedback-field span {
+  color: #696e66;
+  font-size: 11px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+.feedback-choice-group legend {
+  grid-column: 1 / -1;
+}
+.feedback-choice-group label {
   align-items: center;
   background: #f8f8f4;
   border: 1px solid #e8e7df;
-  border-radius: 16px;
+  border-radius: 14px;
   color: var(--wallet-ink);
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 42px minmax(0, 1fr);
-  padding: 12px;
-  text-align: left;
+  display: flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px;
 }
-.feedback-options span:last-child {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
+.feedback-choice-group label.selected {
+  background: #e7f5db;
+  border-color: #a7d775;
+  color: #365f24;
 }
-.feedback-options strong {
+.feedback-choice-group input {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.feedback-field {
+  display: grid;
+  gap: 7px;
+}
+.feedback-field input,
+.feedback-field select,
+.feedback-field textarea {
+  background: #f8f8f4;
+  border: 1px solid #e3e3dc;
+  border-radius: 14px;
+  color: var(--wallet-ink);
+  font: inherit;
   font-size: 14px;
+  outline: none;
+  padding: 12px;
+  width: 100%;
 }
-.feedback-options small {
+.feedback-field textarea {
+  line-height: 1.45;
+  min-height: 118px;
+  resize: vertical;
+}
+.feedback-field input:focus,
+.feedback-field select:focus,
+.feedback-field textarea:focus {
+  border-color: #98ca66;
+  box-shadow: 0 0 0 3px #bfe8923d;
+}
+.feedback-field small {
+  justify-self: end;
   color: #777b74;
   font-size: 11px;
-  overflow-wrap: anywhere;
+}
+.feedback-actions {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: 1fr 1fr;
+}
+.feedback-actions button {
+  border-radius: 13px;
+  font-size: 13px;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 11px;
 }
 
 .privacy-sheet {

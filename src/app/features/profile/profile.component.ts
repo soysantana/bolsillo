@@ -16,6 +16,10 @@ export class ProfileComponent implements OnInit {
   openingBalance: number | null = 0;
   helpOpen = false;
   feedbackOpen = false;
+  feedbackType = 'idea';
+  feedbackRating = 'very_useful';
+  feedbackMessageText = '';
+  feedbackContact = '';
   privacyOpen = false;
   deleteAccountOpen = false;
   deletingAccount = false;
@@ -123,36 +127,54 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  openFeedback(channel: 'email' | 'instagram' | 'whatsapp'): void {
-    const message = this.feedbackMessage();
-    const encodedMessage = encodeURIComponent(message);
-    this.feedbackOpen = false;
-    if (channel === 'email') {
-      window.location.href = `mailto:santana.inffo@gmail.com?subject=${encodeURIComponent('Feedback de Bolsillo')}&body=${encodedMessage}`;
+  submitFeedbackPreview(): void {
+    if (!this.feedbackMessageText.trim()) {
+      this.formError = 'Escribe tu comentario antes de enviarlo.';
       return;
     }
-    const url =
-      channel === 'whatsapp'
-        ? `https://wa.me/18094511877?text=${encodedMessage}`
-        : 'https://ig.me/m/soysantana2';
-    window.open(url, '_blank', 'noopener');
+    this.feedbackOpen = false;
+    this.feedbackType = 'idea';
+    this.feedbackRating = 'very_useful';
+    this.feedbackMessageText = '';
+    this.feedbackContact = '';
+    this.formError = '';
+    this.store.notice.set('Gracias. Recibimos tu comentario.');
   }
 
-  private feedbackMessage(): string {
+  selectFeedbackType(type: string): void {
+    this.feedbackType = type;
+    this.feedbackRating = this.feedbackRatingOptions()[0].value;
+  }
+
+  feedbackRatingLabel(): string {
+    if (this.feedbackType === 'bug') return '¿Qué tanto te afecta?';
+    if (this.feedbackType === 'question') return '¿Qué tan claro está?';
+    return '¿Qué tan útil sería para ti?';
+  }
+
+  feedbackRatingOptions(): { value: string; label: string }[] {
+    if (this.feedbackType === 'bug') {
+      return [
+        { value: 'blocks_use', label: 'Me impide usar la app' },
+        { value: 'important', label: 'Afecta algo importante' },
+        { value: 'annoying', label: 'Es molesto' },
+        { value: 'minor', label: 'Es menor' },
+      ];
+    }
+    if (this.feedbackType === 'question') {
+      return [
+        { value: 'not_clear', label: 'Nada claro' },
+        { value: 'slightly_clear', label: 'Poco claro' },
+        { value: 'somewhat_clear', label: 'Más o menos' },
+        { value: 'clear', label: 'Claro' },
+      ];
+    }
     return [
-      'Hola, quiero compartir este comentario sobre Bolsillo:',
-      '',
-      '',
-      '---',
-      `Plataforma: ${this.platformLabel()}`,
-    ].join('\n');
-  }
-
-  private platformLabel(): string {
-    const userAgent = navigator.userAgent;
-    if (/iPhone|iPad|iPod/i.test(userAgent)) return 'iOS web';
-    if (/Android/i.test(userAgent)) return 'Android web';
-    return 'Web';
+      { value: 'very_useful', label: 'Muy útil' },
+      { value: 'useful', label: 'Útil' },
+      { value: 'maybe', label: 'Más o menos' },
+      { value: 'not_needed', label: 'No la necesito' },
+    ];
   }
 
   async selectBackup(event: Event): Promise<void> {

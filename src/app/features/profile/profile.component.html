@@ -279,26 +279,90 @@
   <ng-template>
     <section class="compact-sheet feedback-sheet">
       <header class="dialog-header">
-        <h2>Enviar sugerencia</h2>
+        <h2>Enviar comentario</h2>
         <button type="button" aria-label="Cerrar" (click)="feedbackOpen = false">
           <app-icon name="close" />
         </button>
       </header>
-      <p class="feedback-copy">Elige la vía que te resulte más cómoda.</p>
-      <div class="feedback-options">
-        <button type="button" (click)="openFeedback('whatsapp')">
-          <span class="menu-icon mint"><app-icon name="whatsapp" /></span>
-          <span><strong>WhatsApp</strong><small>Respuesta rápida</small></span>
-        </button>
-        <button type="button" (click)="openFeedback('instagram')">
-          <span class="menu-icon rose"><app-icon name="instagram" /></span>
-          <span><strong>Instagram</strong><small>DM a @soysantana2</small></span>
-        </button>
-        <button type="button" (click)="openFeedback('email')">
-          <span class="menu-icon sky"><app-icon name="mail" /></span>
-          <span><strong>Correo</strong><small>santana.inffo@gmail.com</small></span>
-        </button>
-      </div>
+      <p class="feedback-copy">
+        Cuéntanos qué podemos mejorar. Tu opinión nos ayuda a hacer Bolsillo más útil.
+      </p>
+      <form class="feedback-form" (ngSubmit)="submitFeedbackPreview()">
+        <fieldset class="feedback-choice-group">
+          <legend>Tipo</legend>
+          <label [class.selected]="feedbackType === 'idea'">
+            <input
+              type="radio"
+              name="feedbackType"
+              value="idea"
+              [ngModel]="feedbackType"
+              (ngModelChange)="selectFeedbackType($event)"
+            />
+            <span>Idea</span>
+          </label>
+          <label [class.selected]="feedbackType === 'bug'">
+            <input
+              type="radio"
+              name="feedbackType"
+              value="bug"
+              [ngModel]="feedbackType"
+              (ngModelChange)="selectFeedbackType($event)"
+            />
+            <span>Error</span>
+          </label>
+          <label [class.selected]="feedbackType === 'question'">
+            <input
+              type="radio"
+              name="feedbackType"
+              value="question"
+              [ngModel]="feedbackType"
+              (ngModelChange)="selectFeedbackType($event)"
+            />
+            <span>Duda</span>
+          </label>
+        </fieldset>
+
+        <label class="feedback-field" for="feedback-rating">
+          <span>{{ feedbackRatingLabel() }}</span>
+          <select id="feedback-rating" name="feedbackRating" [(ngModel)]="feedbackRating">
+            @for (option of feedbackRatingOptions(); track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="feedback-field" for="feedback-message">
+          <span>Comentario</span>
+          <textarea
+            id="feedback-message"
+            name="feedbackMessage"
+            [(ngModel)]="feedbackMessageText"
+            maxlength="800"
+            rows="5"
+            placeholder="Ej. Me gustaría ver un resumen semanal de mis gastos."
+            required
+          ></textarea>
+          <small>{{ feedbackMessageText.length }}/800</small>
+        </label>
+
+        <label class="feedback-field" for="feedback-contact">
+          <span>Contacto opcional</span>
+          <input
+            id="feedback-contact"
+            name="feedbackContact"
+            [(ngModel)]="feedbackContact"
+            maxlength="120"
+            placeholder="Correo o teléfono si quieres que te respondamos"
+          />
+        </label>
+
+        <div class="feedback-actions">
+          <button class="cancel-button" type="button" (click)="feedbackOpen = false">
+            Ahora no
+          </button>
+          <button class="confirm-button" type="submit">Enviar comentario</button>
+        </div>
+      </form>
     </section>
   </ng-template>
 </ion-modal>
@@ -337,8 +401,8 @@
           copias que hayas guardado o compartido por tu cuenta siguen bajo tu control.
         </p>
         <p>
-          Si nos envías una sugerencia, recibiremos el mensaje que escribas y el contacto que uses:
-          correo, Instagram o WhatsApp.
+          Si nos envías un comentario, recibiremos el mensaje que escribas y el contacto opcional que
+          decidas incluir.
         </p>
         <p>Bolsillo no sustituye asesoría financiera profesional.</p>
         <small>Última actualización: septiembre 2026</small>
