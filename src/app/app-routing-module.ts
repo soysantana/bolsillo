@@ -6,7 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   ...DEVELOPMENT_ROUTES,
   ...ACCOUNT_ROUTES,
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
+  { path: '', pathMatch: 'full', redirectTo: 'inicio' },
   ...(['login', 'register', 'forgot-password', 'verify-email', 'reset-password'] as const).map(
     (screen) => ({
       path: screen,

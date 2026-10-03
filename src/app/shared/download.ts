@@ -4,6 +4,8 @@ import { Share } from '@capacitor/share';
 
 export type DownloadResult = 'downloaded' | 'opened' | 'saved' | 'shared';
 
+const BACKUP_FOLDER = 'Bolsillo';
+
 const isAppleMobile = (): boolean =>
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -39,8 +41,14 @@ const shareNativeFile = async (uri: string, name: string): Promise<boolean> => {
 };
 
 const saveNativeFile = async (name: string, content: string): Promise<DownloadResult> => {
+  await Filesystem.mkdir({
+    path: BACKUP_FOLDER,
+    directory: Directory.Documents,
+    recursive: true,
+  }).catch(() => undefined);
+
   const { uri } = await Filesystem.writeFile({
-    path: name,
+    path: `${BACKUP_FOLDER}/${name}`,
     data: content,
     directory: Directory.Documents,
     encoding: Encoding.UTF8,

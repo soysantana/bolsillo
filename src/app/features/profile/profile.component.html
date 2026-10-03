@@ -137,25 +137,25 @@
       </div>
     </div>
     <div class="menu-card">
-      <a class="menu-row link-row" routerLink="/perfil/cuenta"
+      <div class="menu-row future-row"
         ><span class="menu-icon mint"><app-icon name="profile" /></span
         ><span class="menu-copy"
           ><strong>Mi perfil</strong><small>Datos de tu cuenta de acceso</small></span
-        ><app-icon class="chevron" name="chevron"
-      /></a>
-      <a class="menu-row link-row" routerLink="/perfil/seguridad"
+        ><span class="soon-pill">Próximamente</span></div
+      >
+      <div class="menu-row future-row"
         ><span class="menu-icon lilac"><app-icon name="shield" /></span
         ><span class="menu-copy"
           ><strong>Seguridad</strong><small>Contraseña y dispositivos</small></span
-        ><app-icon class="chevron" name="chevron"
-      /></a>
-      <button class="menu-row link-row" type="button" (click)="deleteAccountOpen = true">
+        ><span class="soon-pill">Próximamente</span></div
+      >
+      <div class="menu-row future-row">
         <span class="menu-icon rose"><app-icon name="trash" /></span>
         <span class="menu-copy"
           ><strong>Eliminar cuenta</strong><small>Revisa antes de continuar</small></span
         >
-        <app-icon class="chevron" name="chevron" />
-      </button>
+        <span class="soon-pill">Próximamente</span>
+      </div>
     </div>
   </section>
 
