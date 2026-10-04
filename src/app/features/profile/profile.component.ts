@@ -3,6 +3,7 @@ import { FinanceStore } from '../../core/services/finance-store.service';
 import { localDate } from '../../core/models/finance.models';
 import { PaymentReminderService } from '../../core/services/payment-reminder.service';
 import { downloadFile } from '../../shared/download';
+import { FeedbackService, FeedbackType } from '../../core/services/feedback.service';
 @Component({
   selector: 'app-profile',
   standalone: false,
@@ -20,6 +21,7 @@ export class ProfileComponent implements OnInit {
   feedbackRating = 'very_useful';
   feedbackMessageText = '';
   feedbackContact = '';
+  feedbackSubmitting = false;
   privacyOpen = false;
   deleteAccountOpen = false;
   deletingAccount = false;
@@ -30,6 +32,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     readonly store: FinanceStore,
     readonly reminders: PaymentReminderService,
+    private readonly feedback: FeedbackService,
     private readonly changeDetector: ChangeDetectorRef,
   ) {}
   ngOnInit(): void {
@@ -127,18 +130,30 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  submitFeedbackPreview(): void {
-    if (!this.feedbackMessageText.trim()) {
+  async submitFeedback(): Promise<void> {
+    const message = this.feedbackMessageText.trim();
+    const contact = this.feedbackContact.trim();
+    if (!message) {
       this.formError = 'Escribe tu comentario antes de enviarlo.';
       return;
     }
-    this.feedbackOpen = false;
-    this.feedbackType = 'idea';
-    this.feedbackRating = 'very_useful';
-    this.feedbackMessageText = '';
-    this.feedbackContact = '';
     this.formError = '';
-    this.store.notice.set('Gracias. Recibimos tu comentario.');
+    this.feedbackSubmitting = true;
+    try {
+      await this.feedback.submit({
+        type: this.feedbackType as FeedbackType,
+        rating: this.feedbackRating,
+        message,
+        ...(contact ? { contact } : {}),
+      });
+      this.resetFeedbackForm();
+      this.store.notice.set('Gracias. Recibimos tu comentario.');
+    } catch {
+      this.formError = 'No pudimos enviar tu comentario. Inténtalo otra vez.';
+    } finally {
+      this.feedbackSubmitting = false;
+      this.changeDetector.markForCheck();
+    }
   }
 
   selectFeedbackType(type: string): void {
@@ -175,6 +190,14 @@ export class ProfileComponent implements OnInit {
       { value: 'maybe', label: 'Más o menos' },
       { value: 'not_needed', label: 'No la necesito' },
     ];
+  }
+
+  private resetFeedbackForm(): void {
+    this.feedbackOpen = false;
+    this.feedbackType = 'idea';
+    this.feedbackRating = 'very_useful';
+    this.feedbackMessageText = '';
+    this.feedbackContact = '';
   }
 
   async selectBackup(event: Event): Promise<void> {

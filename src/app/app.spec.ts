@@ -1,16 +1,22 @@
 import { Router, RouterOutlet } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
-import { IonApp } from '@ionic/angular';
+import { IonApp, ModalController } from '@ionic/angular';
 import { App } from './app';
 import { AppRoutingModule } from './app-routing-module';
 
 describe('App', () => {
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       declarations: [App],
       imports: [IonApp, RouterOutlet, AppRoutingModule],
+      providers: [
+        { provide: ModalController, useValue: { create: vi.fn(), dismiss: vi.fn() } },
+      ],
     }).compileComponents();
   });
+
+  afterEach(() => localStorage.clear());
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);
@@ -37,5 +43,29 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     expect(fixture.nativeElement.querySelector('ion-app')).toBeTruthy();
+  });
+
+  it('requires policy acceptance before continuing without an account', async () => {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl('/bienvenida');
+    await fixture.whenStable();
+
+    fixture.nativeElement.querySelector('.secondary-action').click();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent).toContain(
+      'Acepta las políticas para continuar sin cuenta.',
+    );
+
+    const checkbox = fixture.nativeElement.querySelector(
+      'input[name="acceptedPolicies"]',
+    ) as HTMLInputElement;
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    fixture.nativeElement.querySelector('.secondary-action').click();
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/inicio');
+    expect(localStorage.getItem('bolsillo-guest-policy-accepted')).toBe('true');
   });
 });

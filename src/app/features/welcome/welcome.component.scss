@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.welcome-page {
+  align-items: center;
+  background:
+    radial-gradient(circle at 28% 8%, #d9f99d 0 13%, transparent 28%),
+    linear-gradient(145deg, #f8faf4 0%, #eef2e8 52%, #dfe8d5 100%);
+  color: #20251f;
+  display: flex;
+  min-height: 100vh;
+  padding: max(24px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+}
+
+.welcome-panel {
+  display: grid;
+  gap: 28px;
+  margin: 0 auto;
+  max-width: 430px;
+  width: 100%;
+}
+
+.brand-lockup {
+  align-items: center;
+  display: flex;
+  font-size: 15px;
+  font-weight: 850;
+  gap: 10px;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #20251f;
+  border-radius: 14px;
+  color: #d7fb64;
+  display: inline-flex;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.welcome-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.eyebrow {
+  color: #65705f;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(36px, 12vw, 56px);
+  letter-spacing: 0;
+  line-height: 0.94;
+  margin: 0;
+}
+
+p {
+  color: #616b5c;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.action-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.primary-action,
+.secondary-action {
+  align-items: center;
+  border: 0;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-weight: 850;
+  gap: 10px;
+  justify-content: center;
+  min-height: 54px;
+  text-decoration: none;
+}
+
+.primary-action {
+  background: #20251f;
+  color: #ffffff;
+}
+
+.secondary-action {
+  background: #d7fb64;
+  color: #20251f;
+  width: 100%;
+}
+
+.guest-card {
+  background: #ffffffd9;
+  border: 1px solid #d7ded0;
+  border-radius: 22px;
+  box-shadow: 0 18px 42px #606c5a21;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.guest-card strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.policy-check {
+  align-items: flex-start;
+  border: 1px solid #d7ded0;
+  border-radius: 16px;
+  color: #444c40;
+  display: flex;
+  font-size: 13px;
+  gap: 10px;
+  line-height: 1.35;
+  padding: 12px;
+}
+
+.policy-check.invalid {
+  border-color: #d55f4c;
+}
+
+.policy-check input {
+  accent-color: #20251f;
+  flex: 0 0 auto;
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}
+
+.policy-error {
+  color: #b24536;
+  font-size: 13px;
+  font-weight: 750;
+}

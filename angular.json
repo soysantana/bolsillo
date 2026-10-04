@@ -59,6 +59,10 @@
               "outputHashing": "all",
               "fileReplacements": [
                 {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                },
+                {
                   "replace": "src/app/development/development.routes.ts",
                   "with": "src/app/development/development.routes.production.ts"
                 }

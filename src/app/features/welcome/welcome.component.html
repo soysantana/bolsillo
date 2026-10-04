@@ -1,0 +1,51 @@
+<main class="welcome-page">
+  <section class="welcome-panel" aria-labelledby="welcome-title">
+    <div class="brand-lockup">
+      <span class="brand-mark">B</span>
+      <span>Bolsillo</span>
+    </div>
+
+    <div class="welcome-copy">
+      <span class="eyebrow">Tu dinero, sin vueltas</span>
+      <h1 id="welcome-title">Organiza tus gastos a tu ritmo</h1>
+      <p>
+        Entra con tu cuenta para guardar tu acceso, o prueba Bolsillo sin cuenta usando este
+        dispositivo.
+      </p>
+    </div>
+
+    <div class="action-stack" aria-label="Opciones de acceso">
+      <a class="primary-action" routerLink="/login">
+        <app-icon name="profile" />
+        <span>Iniciar sesión</span>
+      </a>
+
+      <form class="guest-card" (ngSubmit)="continueWithoutAccount()" novalidate>
+        <div>
+          <strong>Continuar sin cuenta</strong>
+          <p>Tus datos se guardan en este navegador. Si borras sus datos, podrías perderlos.</p>
+        </div>
+
+        <label class="policy-check" [class.invalid]="submitted && !acceptedPolicies">
+          <input
+            type="checkbox"
+            name="acceptedPolicies"
+            [(ngModel)]="acceptedPolicies"
+            required
+            [attr.aria-invalid]="submitted && !acceptedPolicies"
+          />
+          <span>Acepto el aviso de privacidad y entiendo cómo se guardan mis datos.</span>
+        </label>
+
+        @if (submitted && !acceptedPolicies) {
+          <p class="policy-error" role="alert">Acepta las políticas para continuar sin cuenta.</p>
+        }
+
+        <button class="secondary-action" type="submit">
+          <app-icon name="arrow" />
+          <span>Usar sin cuenta</span>
+        </button>
+      </form>
+    </div>
+  </section>
+</main>

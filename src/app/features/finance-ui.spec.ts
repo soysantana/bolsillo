@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { AddTransactionSheetComponent } from '../shared/components/add-transaction-sheet/add-transaction-sheet.component';
 import { FinanceStore } from '../core/services/finance-store.service';
+import { FeedbackService } from '../core/services/feedback.service';
 
 describe('Finance screens', () => {
   let modalCreate: ReturnType<typeof vi.fn>;
@@ -42,6 +43,7 @@ describe('Finance screens', () => {
           useValue: { create: modalCreate, dismiss: vi.fn().mockResolvedValue(true) },
         },
         { provide: ToastController, useValue: { create: toastCreate } },
+        { provide: FeedbackService, useValue: { submit: vi.fn().mockResolvedValue(undefined) } },
       ],
     }).compileComponents();
   });
@@ -66,6 +68,30 @@ describe('Finance screens', () => {
     expect(text.indexOf('Cuenta y seguridad')).toBeLessThan(text.indexOf('Más de Bolsillo'));
     expect(fixture.nativeElement.querySelector('.profile-actions app-logout')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.menu-card app-logout')).toBeNull();
+  });
+  it('submits profile feedback and resets the sheet state', async () => {
+    const feedback = TestBed.inject(FeedbackService);
+    const fixture = TestBed.createComponent(ProfileComponent);
+    const component = fixture.componentInstance;
+    component.feedbackOpen = true;
+    component.feedbackType = 'bug';
+    component.feedbackRating = 'important';
+    component.feedbackMessageText = '  No guarda mis pagos  ';
+    component.feedbackContact = '  ana@example.com  ';
+
+    await component.submitFeedback();
+
+    expect(feedback.submit).toHaveBeenCalledWith({
+      type: 'bug',
+      rating: 'important',
+      message: 'No guarda mis pagos',
+      contact: 'ana@example.com',
+    });
+    expect(component.feedbackOpen).toBe(false);
+    expect(component.feedbackType).toBe('idea');
+    expect(component.feedbackRating).toBe('very_useful');
+    expect(component.feedbackMessageText).toBe('');
+    expect(component.feedbackContact).toBe('');
   });
   it('updates the dashboard after the user saves their profile name', async () => {
     const fixture = TestBed.createComponent(ProfileComponent);

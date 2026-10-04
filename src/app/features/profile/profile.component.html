@@ -287,7 +287,7 @@
       <p class="feedback-copy">
         Cuéntanos qué podemos mejorar. Tu opinión nos ayuda a hacer Bolsillo más útil.
       </p>
-      <form class="feedback-form" (ngSubmit)="submitFeedbackPreview()">
+      <form class="feedback-form" (ngSubmit)="submitFeedback()">
         <fieldset class="feedback-choice-group">
           <legend>Tipo</legend>
           <label [class.selected]="feedbackType === 'idea'">
@@ -356,11 +356,22 @@
           />
         </label>
 
+        @if (formError) {
+          <p class="profile-error" role="alert">{{ formError }}</p>
+        }
+
         <div class="feedback-actions">
-          <button class="cancel-button" type="button" (click)="feedbackOpen = false">
+          <button
+            class="cancel-button"
+            type="button"
+            [disabled]="feedbackSubmitting"
+            (click)="feedbackOpen = false"
+          >
             Ahora no
           </button>
-          <button class="confirm-button" type="submit">Enviar comentario</button>
+          <button class="confirm-button" type="submit" [disabled]="feedbackSubmitting">
+            {{ feedbackSubmitting ? 'Enviando...' : 'Enviar comentario' }}
+          </button>
         </div>
       </form>
     </section>

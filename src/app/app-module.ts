@@ -1,4 +1,5 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonApp, provideIonicAngular } from '@ionic/angular';
@@ -9,7 +10,11 @@ import { App } from './app';
 @NgModule({
   declarations: [App],
   imports: [BrowserModule, IonApp, RouterOutlet, AppRoutingModule],
-  providers: [provideBrowserGlobalErrorListeners(), provideIonicAngular({ mode: 'ios' })],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withInterceptors([])),
+    provideIonicAngular({ mode: 'ios' }),
+  ],
   bootstrap: [App],
 })
 export class AppModule {}
