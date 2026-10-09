@@ -1,0 +1,60 @@
+@if (presentation === 'banner') {
+  <article class="campaign-banner" [class]="message.tone">
+    <button class="banner-main" type="button" (click)="expanded.emit()">
+      <span class="mini-visual" aria-hidden="true">
+        <i></i>
+        <b></b>
+      </span>
+      <span class="campaign-copy">
+        <small>{{ message.eyebrow }}</small>
+        <strong>{{ message.title }}</strong>
+      </span>
+    </button>
+    <button class="icon-action" type="button" aria-label="Cerrar mensaje" (click)="closed.emit()">
+      <app-icon name="close" />
+    </button>
+  </article>
+} @else {
+  <div class="campaign-backdrop" role="presentation" (click)="closed.emit()"></div>
+  <section
+    class="campaign-modal"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'campaign-title-' + message.id"
+    [class]="message.tone"
+  >
+    <button class="modal-close" type="button" aria-label="Cerrar mensaje" (click)="closed.emit()">
+      <app-icon name="close" />
+    </button>
+    <div class="campaign-visual" role="img" [attr.aria-label]="message.imageAlt">
+      <div class="phone-preview">
+        <span></span>
+        <i></i>
+        <b></b>
+      </div>
+      <div class="floating-card first">
+        <small>Tú</small>
+        <strong>RD$850</strong>
+      </div>
+      <div class="floating-card second">
+        <small>Ana</small>
+        <strong>RD$425</strong>
+      </div>
+    </div>
+    <div class="campaign-content">
+      <span>{{ message.eyebrow }}</span>
+      <h2 [id]="'campaign-title-' + message.id">{{ message.title }}</h2>
+      <p>{{ message.body }}</p>
+    </div>
+    <div class="campaign-actions">
+      <button class="primary" type="button" (click)="actionSelected.emit(message.primary)">
+        {{ message.primary.label }}
+      </button>
+      @if (message.secondary) {
+        <button class="secondary" type="button" (click)="actionSelected.emit(message.secondary)">
+          {{ message.secondary.label }}
+        </button>
+      }
+    </div>
+  </section>
+}

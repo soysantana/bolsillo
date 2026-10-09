@@ -26,6 +26,22 @@
   width: 0;
 }
 
+.campaign-layer {
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  z-index: 45;
+}
+
+.campaign-layer app-campaign-message {
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+  pointer-events: auto;
+}
+
 .bottom-nav {
   align-items: center;
   background: color-mix(in srgb, #fff 92%, transparent);

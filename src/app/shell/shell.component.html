@@ -3,6 +3,26 @@
     <router-outlet></router-outlet>
   </ion-content>
 
+  <div class="campaign-layer">
+    @if (campaigns.banner(); as message) {
+      <app-campaign-message
+        [message]="message"
+        presentation="banner"
+        (expanded)="campaigns.open(message)"
+        (closed)="campaigns.close(message); store.notice.set('Mensaje oculto.')"
+      />
+    }
+  </div>
+
+  @if (campaigns.modal(); as message) {
+    <app-campaign-message
+      [message]="message"
+      presentation="modal"
+      (actionSelected)="handleCampaignAction(message, $event)"
+      (closed)="campaigns.close(message); store.notice.set('Mensaje cerrado.')"
+    />
+  }
+
   <div class="notification-stack">
     @if (store.notice()) {
       <div class="app-message" role="status">

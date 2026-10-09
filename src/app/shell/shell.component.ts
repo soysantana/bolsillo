@@ -1,5 +1,10 @@
 import { FinanceStore } from '../core/services/finance-store.service';
 import { Component, effect, inject } from '@angular/core';
+import {
+  CampaignAction,
+  CampaignMessage,
+  CampaignMessageService,
+} from '../core/services/campaign-message.service';
 import { MobileViewportService } from '../core/services/mobile-viewport.service';
 import { PaymentReminderService } from '../core/services/payment-reminder.service';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -17,6 +22,7 @@ export class ShellComponent {
   private readonly viewport = inject(MobileViewportService);
   constructor(
     readonly store: FinanceStore,
+    readonly campaigns: CampaignMessageService,
     private readonly reminders: PaymentReminderService,
     private readonly modalController: ModalController,
   ) {
@@ -46,5 +52,18 @@ export class ShellComponent {
       cssClass: 'transaction-modal',
     });
     await modal.present();
+  }
+
+  handleCampaignAction(message: CampaignMessage, action: CampaignAction): void {
+    this.campaigns.respond(message, action);
+    if (action.response === 'open_transactions') {
+      this.store.notice.set('Perfecto. Puedes revisar tus movimientos cuando quieras.');
+      return;
+    }
+    if (action.response === 'interested') {
+      this.store.notice.set('Gracias. Guardé tu interés en esta idea.');
+      return;
+    }
+    this.store.notice.set('Listo. No volveremos a mostrarte este mensaje.');
   }
 }
