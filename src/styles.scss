@@ -13,6 +13,7 @@
   --wallet-line: #e7e6df;
   --wallet-accent: #c4f65b;
   --wallet-positive: #347b50;
+  --app-keyboard-height: 0px;
   --ion-background-color: var(--wallet-bg);
   --ion-font-family:
     'Avenir Next', Avenir, 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -119,8 +120,10 @@ button {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
+  scroll-margin-block: calc(24px + var(--app-keyboard-height, 0px));
 }
 button {
   min-height: 44px;
@@ -129,7 +132,7 @@ button:disabled {
   cursor: default;
   opacity: 0.6;
 }
-:where(button, a, input, select, summary):focus-visible {
+:where(button, a, input, select, textarea, summary):focus-visible {
   outline: 3px solid #568025 !important;
   outline-offset: 3px;
 }

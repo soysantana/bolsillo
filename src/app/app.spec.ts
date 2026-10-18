@@ -1,8 +1,22 @@
 import { Router, RouterOutlet } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { IonApp, ModalController } from '@ionic/angular';
+import { of } from 'rxjs';
 import { App } from './app';
 import { AppRoutingModule } from './app-routing-module';
+import { AuthApiService } from './core/services/auth-api.service';
+
+class AuthApiStub {
+  isAuthenticated = false;
+
+  authenticated(): boolean {
+    return this.isAuthenticated;
+  }
+
+  initialize() {
+    return of(this.isAuthenticated);
+  }
+}
 
 describe('App', () => {
   beforeEach(async () => {
@@ -12,6 +26,7 @@ describe('App', () => {
       imports: [IonApp, RouterOutlet, AppRoutingModule],
       providers: [
         { provide: ModalController, useValue: { create: vi.fn(), dismiss: vi.fn() } },
+        { provide: AuthApiService, useClass: AuthApiStub },
       ],
     }).compileComponents();
   });
@@ -67,5 +82,26 @@ describe('App', () => {
 
     expect(TestBed.inject(Router).url).toBe('/inicio');
     expect(localStorage.getItem('bolsillo-guest-policy-accepted')).toBe('true');
+  });
+
+  it('requires login to reopen account data after account access is enabled', async () => {
+    localStorage.setItem('bolsillo-account-access', 'true');
+    const fixture = TestBed.createComponent(App);
+
+    await TestBed.inject(Router).navigateByUrl('/inicio');
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/login');
+  });
+
+  it('reopens account data when the saved session refreshes successfully', async () => {
+    localStorage.setItem('bolsillo-account-access', 'true');
+    (TestBed.inject(AuthApiService) as unknown as AuthApiStub).isAuthenticated = true;
+    const fixture = TestBed.createComponent(App);
+
+    await TestBed.inject(Router).navigateByUrl('/inicio');
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/inicio');
   });
 });

@@ -6,13 +6,14 @@ import { IonApp, provideIonicAngular } from '@ionic/angular';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
+import { authInterceptor } from './core/services/auth.interceptor';
 
 @NgModule({
   declarations: [App],
   imports: [BrowserModule, IonApp, RouterOutlet, AppRoutingModule],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([])),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideIonicAngular({ mode: 'ios' }),
   ],
   bootstrap: [App],

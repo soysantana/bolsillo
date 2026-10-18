@@ -2,7 +2,8 @@ import { DEVELOPMENT_ROUTES } from './development/development.routes';
 import { ACCOUNT_ROUTES } from './features/account/account.routes';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { guestPolicyGuard } from './core/guards/guest-policy.guard';
+import { appAccessGuard } from './core/guards/app-access.guard';
+import { authPageGuard } from './core/guards/auth-page.guard';
 
 const routes: Routes = [
   ...DEVELOPMENT_ROUTES,
@@ -17,13 +18,14 @@ const routes: Routes = [
   ...(['login', 'register', 'forgot-password', 'verify-email', 'reset-password'] as const).map(
     (screen) => ({
       path: screen,
+      canActivate: [authPageGuard],
       data: { screen },
       loadComponent: () => import('./features/auth/auth.component').then((m) => m.AuthComponent),
     }),
   ),
   {
     path: '',
-    canActivate: [guestPolicyGuard],
+    canActivate: [appAccessGuard],
     loadChildren: () => import('./shell/shell.module').then((m) => m.ShellModule),
   },
   { path: '**', redirectTo: '' },
