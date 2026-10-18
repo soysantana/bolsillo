@@ -470,7 +470,10 @@ input::placeholder {
     padding:
       calc(22px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px)))
       calc(22px + var(--ion-safe-area-right, env(safe-area-inset-right, 0px)))
-      calc(28px + var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px)))
+      calc(
+        28px + var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px)) +
+          var(--app-keyboard-height, 0px)
+      )
       calc(22px + var(--ion-safe-area-left, env(safe-area-inset-left, 0px)));
   }
 
@@ -489,7 +492,7 @@ input::placeholder {
     overflow-wrap: anywhere;
   }
   .input-wrap input {
-    scroll-margin-block: 20px;
+    scroll-margin-block: calc(20px + var(--app-keyboard-height, 0px));
   }
 }
 

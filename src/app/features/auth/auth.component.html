@@ -19,303 +19,328 @@
         @if (notice) {
           <p class="status-note" role="status">{{ notice }}</p>
         }
-        @if (screen !== 'login') {
-          <a class="back-link" [routerLink]="returnTo"
-            ><span aria-hidden="true">←</span>
-            {{
-              returnTo === '/perfil/cuenta' ? 'Volver a Mi perfil' : 'Volver a iniciar sesión'
-            }}</a
-          >
-        }
-        @if (!done) {
-          <div
-            class="section-icon"
-            [class.lilac]="screen === 'verify-email'"
-            [class.compact]="
-              screen === 'login' ||
-              screen === 'register' ||
-              screen === 'forgot-password' ||
-              screen === 'verify-email'
-            "
-          >
-            <app-icon [name]="content.icon" />
-          </div>
-          @if (content.eyebrow) {
-            <span class="eyebrow">{{ content.eyebrow }}</span>
-          }
-          <h1>{{ content.title }}</h1>
-          @if (content.description) {
-            <p class="intro">{{ content.description }}</p>
-          }
-
-          @if (invalidLink) {
-            <p class="form-error" role="alert">
-              Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.
+        @if (showLocalDataLink) {
+          <div class="link-data-card" role="status" aria-labelledby="link-data-title">
+            <div class="section-icon compact">
+              <app-icon name="wallet" />
+            </div>
+            <h1 id="link-data-title">Guarda tus datos en tu cuenta</h1>
+            <p class="intro">
+              Encontramos movimientos y ajustes guardados en este dispositivo. Puedes dejarlos
+              listos para vincularlos con tu cuenta cuando la sincronización esté disponible.
             </p>
-            @if (screen === 'reset-password') {
-              <a class="primary" routerLink="/forgot-password">Solicitar otro enlace</a>
-            } @else {
-              <button class="primary" type="button" (click)="resend()" [disabled]="busy">
-                Reenviar correo
-              </button>
+            @if (localDataLinkRequested) {
+              <p class="status-note">Listo. Dejamos tus datos marcados para vincular.</p>
             }
-          } @else if (screen === 'verify-email') {
-            <div class="email-card">
-              <app-icon name="mail" />
-              <div>
-                <span>Correo de tu cuenta</span
-                ><strong>{{ email || 'Tu dirección de correo' }}</strong>
-              </div>
-              <a routerLink="/register" aria-label="Cambiar correo"><app-icon name="edit" /></a>
-            </div>
-            <button class="primary" type="button" (click)="verify()" [disabled]="busy">
-              {{ busy ? progressMessage : content.action }} <app-icon name="arrow" />
+            <button class="primary" type="button" (click)="linkLocalData()">
+              Guardar con mi cuenta <app-icon name="arrow" />
             </button>
-            <div class="resend">
-              <span>¿No recibiste el correo?</span
-              ><button type="button" [disabled]="resent || busy" (click)="resend()">
-                {{ resent ? 'Correo reenviado' : 'Reenviar correo' }}
-              </button>
+            <button class="plain-button" type="button" (click)="continueWithoutLinking()">
+              Ahora no
+            </button>
+          </div>
+        } @else {
+          @if (screen !== 'login') {
+            <a class="back-link" [routerLink]="returnTo"
+              ><span aria-hidden="true">←</span>
+              {{
+                returnTo === '/perfil/cuenta' ? 'Volver a Mi perfil' : 'Volver a iniciar sesión'
+              }}</a
+            >
+          }
+          @if (!done) {
+            <div
+              class="section-icon"
+              [class.lilac]="screen === 'verify-email'"
+              [class.compact]="
+                screen === 'login' ||
+                screen === 'register' ||
+                screen === 'forgot-password' ||
+                screen === 'verify-email'
+              "
+            >
+              <app-icon [name]="content.icon" />
             </div>
-            @if (resent) {
-              <p class="status-note" role="status">
-                Te enviamos otro enlace. Puede tardar unos minutos en llegar.
-              </p>
+            @if (content.eyebrow) {
+              <span class="eyebrow">{{ content.eyebrow }}</span>
             }
-          } @else {
-            <form #form="ngForm" (ngSubmit)="submit(form)" novalidate [attr.aria-busy]="busy">
-              <fieldset [disabled]="busy">
-                @if (screen === 'register') {
-                  <div class="field">
-                    <label for="name">Tu nombre</label>
-                    <div class="input-wrap" [class.invalid]="submitted && nameInput.invalid">
-                      <app-icon name="profile" /><input
-                        id="name"
-                        name="name"
-                        [(ngModel)]="name"
-                        #nameInput="ngModel"
-                        required
-                        minlength="2"
-                        maxlength="120"
-                        autocomplete="name"
-                        placeholder="¿Cómo te llamas?"
-                        [attr.aria-invalid]="submitted && nameInput.invalid"
-                        aria-describedby="name-error"
-                      />
-                    </div>
-                    <small id="name-error" class="error">
-                      @if (submitted && nameInput.invalid) {
-                        Escribe tu nombre (al menos 2 caracteres).
-                      }
-                    </small>
-                  </div>
-                }
-                @if (screen !== 'reset-password') {
-                  <div class="field">
-                    <label for="email">Correo electrónico</label>
-                    <div class="input-wrap" [class.invalid]="submitted && emailInput.invalid">
-                      <app-icon name="mail" /><input
-                        id="email"
-                        type="email"
-                        name="email"
-                        [(ngModel)]="email"
-                        #emailInput="ngModel"
-                        required
-                        email
-                        maxlength="254"
-                        autocomplete="email"
-                        inputmode="email"
-                        autocapitalize="none"
-                        spellcheck="false"
-                        placeholder="tu@correo.com"
-                        [attr.aria-invalid]="submitted && emailInput.invalid"
-                        aria-describedby="email-error"
-                      />
-                    </div>
-                    <small id="email-error" class="error">
-                      @if (submitted && emailInput.invalid) {
-                        Escribe un correo electrónico válido.
-                      }
-                    </small>
-                  </div>
-                }
-                @if (screen !== 'forgot-password') {
-                  <div class="field">
-                    <label for="password">{{
-                      screen === 'reset-password' ? 'Nueva contraseña' : 'Contraseña'
-                    }}</label>
-                    <div
-                      class="input-wrap"
-                      [class.invalid]="
-                        submitted && (passwordInput.invalid || (creatingPassword && !passwordValid))
-                      "
-                    >
-                      <app-icon name="shield" /><input
-                        id="password"
-                        [type]="showPassword ? 'text' : 'password'"
-                        name="password"
-                        [(ngModel)]="password"
-                        #passwordInput="ngModel"
-                        required
-                        maxlength="128"
-                        [autocomplete]="creatingPassword ? 'new-password' : 'current-password'"
-                        [placeholder]="
-                          creatingPassword ? 'Crea una contraseña segura' : 'Tu contraseña'
-                        "
-                        [attr.aria-invalid]="
-                          submitted &&
-                          (passwordInput.invalid || (creatingPassword && !passwordValid))
-                        "
-                        aria-describedby="password-error password-rules"
-                      /><button
-                        type="button"
-                        class="visibility"
-                        (click)="showPassword = !showPassword"
-                        [attr.aria-label]="
-                          showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-                        "
-                        [attr.aria-pressed]="showPassword"
-                      >
-                        <app-icon [name]="showPassword ? 'eye-off' : 'eye'" />
-                      </button>
-                    </div>
-                    <small id="password-error" class="error">
-                      @if (submitted && passwordInput.invalid) {
-                        Escribe tu contraseña.
-                      } @else if (submitted && creatingPassword && !passwordValid) {
-                        Completa los requisitos de tu contraseña.
-                      }
-                    </small>
-                  </div>
-                  <div id="password-rules">
-                    @if (creatingPassword) {
-                      <ul class="password-rules">
-                        @for (check of checks; track check.label) {
-                          <li [class.met]="check.valid">
-                            <span aria-hidden="true">{{ check.valid ? '✓' : '○' }}</span
-                            ><span class="sr-only">{{
-                              check.valid ? 'Cumplido: ' : 'Pendiente: '
-                            }}</span
-                            >{{ check.label }}
-                          </li>
-                        }
-                      </ul>
-                    }
-                  </div>
-                  @if (creatingPassword) {
+            <h1>{{ content.title }}</h1>
+            @if (content.description) {
+              <p class="intro">{{ content.description }}</p>
+            }
+
+            @if (invalidLink) {
+              <p class="form-error" role="alert">
+                Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.
+              </p>
+              @if (screen === 'reset-password') {
+                <a class="primary" routerLink="/forgot-password">Solicitar otro enlace</a>
+              } @else {
+                <button class="primary" type="button" (click)="resend()" [disabled]="busy">
+                  Reenviar correo
+                </button>
+              }
+            } @else if (screen === 'verify-email') {
+              <div class="email-card">
+                <app-icon name="mail" />
+                <div>
+                  <span>Correo de tu cuenta</span
+                  ><strong>{{ email || 'Tu dirección de correo' }}</strong>
+                </div>
+                <a routerLink="/register" aria-label="Cambiar correo"><app-icon name="edit" /></a>
+              </div>
+              <button class="primary" type="button" (click)="verify()" [disabled]="busy">
+                {{ busy ? progressMessage : content.action }} <app-icon name="arrow" />
+              </button>
+              <div class="resend">
+                <span>¿No recibiste el correo?</span
+                ><button type="button" [disabled]="resent || busy" (click)="resend()">
+                  {{ resent ? 'Correo reenviado' : 'Reenviar correo' }}
+                </button>
+              </div>
+              @if (resent) {
+                <p class="status-note" role="status">
+                  Te enviamos otro enlace. Puede tardar unos minutos en llegar.
+                </p>
+              }
+            } @else {
+              <form #form="ngForm" (ngSubmit)="submit(form)" novalidate [attr.aria-busy]="busy">
+                <fieldset [disabled]="busy">
+                  @if (screen === 'register') {
                     <div class="field">
-                      <label for="confirmation">Confirma tu contraseña</label>
-                      <div
-                        class="input-wrap"
-                        [class.invalid]="submitted && (!confirmation || confirmation !== password)"
-                      >
-                        <app-icon name="shield" /><input
-                          id="confirmation"
-                          [type]="showConfirmation ? 'text' : 'password'"
-                          name="confirmation"
-                          [(ngModel)]="confirmation"
+                      <label for="name">Tu nombre</label>
+                      <div class="input-wrap" [class.invalid]="submitted && nameInput.invalid">
+                        <app-icon name="profile" /><input
+                          id="name"
+                          name="name"
+                          [(ngModel)]="name"
+                          #nameInput="ngModel"
                           required
-                          maxlength="128"
-                          autocomplete="new-password"
-                          placeholder="Escríbela una vez más"
-                          aria-describedby="confirmation-error"
-                          [attr.aria-invalid]="
-                            submitted && (!confirmation || confirmation !== password)
-                          "
+                          minlength="2"
+                          maxlength="120"
+                          autocomplete="name"
+                          placeholder="¿Cómo te llamas?"
+                          [attr.aria-invalid]="submitted && nameInput.invalid"
+                          aria-describedby="name-error"
                         />
-                        <button
-                          type="button"
-                          class="visibility"
-                          (click)="showConfirmation = !showConfirmation"
-                          [attr.aria-label]="
-                            showConfirmation ? 'Ocultar confirmación' : 'Mostrar confirmación'
-                          "
-                          [attr.aria-pressed]="showConfirmation"
-                        >
-                          <app-icon [name]="showConfirmation ? 'eye-off' : 'eye'" />
-                        </button>
                       </div>
-                      <small id="confirmation-error" class="error">
-                        @if (submitted && !confirmation) {
-                          Confirma tu contraseña.
-                        } @else if (submitted && confirmation !== password) {
-                          Las contraseñas no coinciden.
+                      <small id="name-error" class="error">
+                        @if (submitted && nameInput.invalid) {
+                          Escribe tu nombre (al menos 2 caracteres).
                         }
                       </small>
                     </div>
                   }
-                  @if (screen === 'login') {
-                    <div class="forgot-row">
-                      <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
+                  @if (screen !== 'reset-password') {
+                    <div class="field">
+                      <label for="email">Correo electrónico</label>
+                      <div class="input-wrap" [class.invalid]="submitted && emailInput.invalid">
+                        <app-icon name="mail" /><input
+                          id="email"
+                          type="email"
+                          name="email"
+                          [(ngModel)]="email"
+                          #emailInput="ngModel"
+                          required
+                          email
+                          maxlength="254"
+                          autocomplete="email"
+                          inputmode="email"
+                          autocapitalize="none"
+                          spellcheck="false"
+                          placeholder="tu@correo.com"
+                          [attr.aria-invalid]="submitted && emailInput.invalid"
+                          aria-describedby="email-error"
+                        />
+                      </div>
+                      <small id="email-error" class="error">
+                        @if (submitted && emailInput.invalid) {
+                          Escribe un correo electrónico válido.
+                        }
+                      </small>
                     </div>
                   }
-                }
-                @if (error) {
-                  <p class="form-error" role="alert">{{ error }}</p>
-                }
-                <button type="submit" class="primary" [disabled]="busy">
-                  {{ busy ? progressMessage : content.action }} <app-icon name="arrow" />
-                </button>
-              </fieldset>
-            </form>
-            @if (screen === 'login') {
-              <p class="switch-screen">
-                ¿Primera vez por aquí? <a routerLink="/register">Crear una cuenta</a>
+                  @if (screen !== 'forgot-password') {
+                    <div class="field">
+                      <label for="password">{{
+                        screen === 'reset-password' ? 'Nueva contraseña' : 'Contraseña'
+                      }}</label>
+                      <div
+                        class="input-wrap"
+                        [class.invalid]="
+                          submitted &&
+                          (passwordInput.invalid || (creatingPassword && !passwordValid))
+                        "
+                      >
+                        <app-icon name="shield" /><input
+                          id="password"
+                          [type]="showPassword ? 'text' : 'password'"
+                          name="password"
+                          [(ngModel)]="password"
+                          #passwordInput="ngModel"
+                          required
+                          maxlength="128"
+                          [autocomplete]="creatingPassword ? 'new-password' : 'current-password'"
+                          [placeholder]="
+                            creatingPassword ? 'Crea una contraseña segura' : 'Tu contraseña'
+                          "
+                          [attr.aria-invalid]="
+                            submitted &&
+                            (passwordInput.invalid || (creatingPassword && !passwordValid))
+                          "
+                          aria-describedby="password-error password-rules"
+                        /><button
+                          type="button"
+                          class="visibility"
+                          (click)="showPassword = !showPassword"
+                          [attr.aria-label]="
+                            showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                          "
+                          [attr.aria-pressed]="showPassword"
+                        >
+                          <app-icon [name]="showPassword ? 'eye-off' : 'eye'" />
+                        </button>
+                      </div>
+                      <small id="password-error" class="error">
+                        @if (submitted && passwordInput.invalid) {
+                          Escribe tu contraseña.
+                        } @else if (submitted && creatingPassword && !passwordValid) {
+                          Completa los requisitos de tu contraseña.
+                        }
+                      </small>
+                    </div>
+                    <div id="password-rules">
+                      @if (creatingPassword) {
+                        <ul class="password-rules">
+                          @for (check of checks; track check.label) {
+                            <li [class.met]="check.valid">
+                              <span aria-hidden="true">{{ check.valid ? '✓' : '○' }}</span
+                              ><span class="sr-only">{{
+                                check.valid ? 'Cumplido: ' : 'Pendiente: '
+                              }}</span
+                              >{{ check.label }}
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                    @if (creatingPassword) {
+                      <div class="field">
+                        <label for="confirmation">Confirma tu contraseña</label>
+                        <div
+                          class="input-wrap"
+                          [class.invalid]="
+                            submitted && (!confirmation || confirmation !== password)
+                          "
+                        >
+                          <app-icon name="shield" /><input
+                            id="confirmation"
+                            [type]="showConfirmation ? 'text' : 'password'"
+                            name="confirmation"
+                            [(ngModel)]="confirmation"
+                            required
+                            maxlength="128"
+                            autocomplete="new-password"
+                            placeholder="Escríbela una vez más"
+                            aria-describedby="confirmation-error"
+                            [attr.aria-invalid]="
+                              submitted && (!confirmation || confirmation !== password)
+                            "
+                          />
+                          <button
+                            type="button"
+                            class="visibility"
+                            (click)="showConfirmation = !showConfirmation"
+                            [attr.aria-label]="
+                              showConfirmation ? 'Ocultar confirmación' : 'Mostrar confirmación'
+                            "
+                            [attr.aria-pressed]="showConfirmation"
+                          >
+                            <app-icon [name]="showConfirmation ? 'eye-off' : 'eye'" />
+                          </button>
+                        </div>
+                        <small id="confirmation-error" class="error">
+                          @if (submitted && !confirmation) {
+                            Confirma tu contraseña.
+                          } @else if (submitted && confirmation !== password) {
+                            Las contraseñas no coinciden.
+                          }
+                        </small>
+                      </div>
+                    }
+                    @if (screen === 'login') {
+                      <div class="forgot-row">
+                        <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
+                      </div>
+                    }
+                  }
+                  @if (error) {
+                    <p class="form-error" role="alert">{{ error }}</p>
+                  }
+                  <button type="submit" class="primary" [disabled]="busy">
+                    {{ busy ? progressMessage : content.action }} <app-icon name="arrow" />
+                  </button>
+                </fieldset>
+              </form>
+              @if (screen === 'login') {
+                <p class="switch-screen">
+                  ¿Primera vez por aquí? <a routerLink="/register">Crear una cuenta</a>
+                </p>
+              }
+              @if (screen === 'register') {
+                <p class="switch-screen">
+                  ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+                </p>
+              }
+              @if (screen === 'forgot-password') {
+                <p class="fine-note">Revisa spam si no lo ves.</p>
+              }
+            }
+            @if (busy) {
+              <p class="status-note" role="status">
+                {{ progressMessage }}
               </p>
             }
-            @if (screen === 'register') {
-              <p class="switch-screen">
-                ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
-              </p>
-            }
-            @if (screen === 'forgot-password') {
-              <p class="fine-note">Revisa spam si no lo ves.</p>
-            }
-          }
-          @if (busy) {
-            <p class="status-note" role="status">
-              {{ progressMessage }}
-            </p>
-          }
-        } @else {
-          <h1>
-            {{
-              screen === 'forgot-password'
-                ? 'Revisa tu correo.'
-                : screen === 'verify-email'
-                  ? 'Correo verificado'
-                  : screen === 'reset-password'
-                    ? 'Contraseña actualizada'
-                    : 'Listo'
-            }}
-          </h1>
-          <p class="intro">
-            {{
-              screen === 'forgot-password'
-                ? 'Si hay una cuenta con ese correo, recibirás un enlace para cambiar tu contraseña.'
-                : screen === 'verify-email'
-                  ? 'Ya puedes iniciar sesión.'
-                  : screen === 'reset-password'
-                    ? 'Ya puedes iniciar sesión.'
-                    : 'Ya puedes continuar.'
-            }}
-          </p>
-          @if (screen === 'forgot-password') {
-            <a class="primary" routerLink="/login"
-              >Volver a iniciar sesión <app-icon name="arrow"
-            /></a>
-            <button class="plain-button" type="button" (click)="done = false; submitted = false">
-              Cambiar correo
-            </button>
           } @else {
-            <a class="primary" [routerLink]="screen === 'verify-email' ? returnTo : '/login'"
-              >{{
-                returnTo === '/perfil/cuenta' && screen === 'verify-email'
-                  ? 'Volver a Mi perfil'
-                  : 'Ir a iniciar sesión'
+            <h1>
+              {{
+                screen === 'forgot-password'
+                  ? 'Revisa tu correo.'
+                  : screen === 'verify-email'
+                    ? 'Correo verificado'
+                    : screen === 'reset-password'
+                      ? 'Contraseña actualizada'
+                      : 'Listo'
               }}
-              <app-icon name="arrow"
-            /></a>
+            </h1>
+            <p class="intro">
+              {{
+                screen === 'forgot-password'
+                  ? 'Si hay una cuenta con ese correo, recibirás un enlace para cambiar tu contraseña.'
+                  : screen === 'verify-email'
+                    ? 'Ya puedes iniciar sesión.'
+                    : screen === 'reset-password'
+                      ? 'Ya puedes iniciar sesión.'
+                      : 'Ya puedes continuar.'
+              }}
+            </p>
+            @if (screen === 'forgot-password') {
+              <a class="primary" routerLink="/login"
+                >Volver a iniciar sesión <app-icon name="arrow"
+              /></a>
+              <button class="plain-button" type="button" (click)="done = false; submitted = false">
+                Cambiar correo
+              </button>
+            } @else {
+              <a class="primary" [routerLink]="screen === 'verify-email' ? returnTo : '/login'"
+                >{{
+                  returnTo === '/perfil/cuenta' && screen === 'verify-email'
+                    ? 'Volver a Mi perfil'
+                    : 'Ir a iniciar sesión'
+                }}
+                <app-icon name="arrow"
+              /></a>
+            }
           }
         }
       </div>

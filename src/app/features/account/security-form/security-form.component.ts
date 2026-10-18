@@ -2,6 +2,7 @@ import { Component, DestroyRef, OnInit, inject, input, output, signal } from '@a
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { AccountDemo, PreviewAction } from '../account-demo';
 import { FinanceStore } from '../../../core/services/finance-store.service';
 import { PaymentReminderService } from '../../../core/services/payment-reminder.service';
@@ -11,6 +12,9 @@ import { accountPaths } from '../account.routes';
 import { passwordChecks } from '../../auth/password-policy';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { AuthApiService } from '../../../core/services/auth-api.service';
+import { authApiMessage } from '../../../core/services/api-error-message';
+import { GuestAccessService } from '../../../core/services/guest-access.service';
 @Component({
   selector: 'app-security-form',
   imports: [FormsModule, RouterLink, ConfirmationComponent, IconComponent],
@@ -34,6 +38,8 @@ export class SecurityFormComponent implements OnInit {
   private readonly store = inject(FinanceStore);
   private readonly reminders = inject(PaymentReminderService);
   private readonly demo = inject(AccountDemo);
+  private readonly auth = inject(AuthApiService);
+  private readonly guestAccess = inject(GuestAccessService);
   preview = false;
   screen = 'password';
   current = '';
@@ -123,27 +129,57 @@ export class SecurityFormComponent implements OnInit {
       this.busyChanged.emit(true);
       this.flow.state.set('loading');
       this.flow.error.set('');
-      try {
-        await this.reminders.deleteLocalData();
-        this.store.deleteLocalData();
-        this.demo.closeAll();
-        this.demo.identity.set({ name: '', email: '', verified: false });
-        this.clear();
-        this.confirming.set(false);
-        this.flow.state.set('success');
-      } catch {
-        this.flow.state.set('error');
-        this.flow.error.set('No pudimos completar la eliminación. Inténtalo de nuevo.');
-      } finally {
-        this.deleting.set(false);
-        this.busyChanged.emit(false);
+      if (this.auth.authenticated()) {
+        this.auth
+          .deleteAccount(this.current)
+          .pipe(
+            takeUntilDestroyed(this.destroyRef),
+            finalize(() => {
+              this.deleting.set(false);
+              this.busyChanged.emit(false);
+            }),
+          )
+          .subscribe({
+            next: () => void this.deleteLocalAccountData(),
+            error: (error: unknown) => {
+              this.flow.state.set('error');
+              this.flow.error.set(
+                authApiMessage(error) ?? 'No pudimos eliminar tu cuenta. Inténtalo de nuevo.',
+              );
+            },
+          });
+        return;
       }
+      await this.deleteLocalAccountData();
+      this.deleting.set(false);
+      this.busyChanged.emit(false);
       return;
     }
-    this.flow.run(() => {
-      this.clear();
-      this.confirming.set(false);
-    });
+    if (!this.auth.authenticated()) {
+      this.flow.run(() => {
+        this.clear();
+        this.confirming.set(false);
+      });
+      return;
+    }
+    this.flow.state.set('loading');
+    this.flow.error.set('');
+    this.auth
+      .changePassword(this.current, this.password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.clear();
+          this.confirming.set(false);
+          this.flow.state.set('success');
+        },
+        error: (error: unknown) => {
+          this.flow.state.set('error');
+          this.flow.error.set(
+            authApiMessage(error) ?? 'No pudimos guardar la contraseña. Inténtalo de nuevo.',
+          );
+        },
+      });
   }
   cancel(): void {
     if (this.deleting()) return;
@@ -156,5 +192,21 @@ export class SecurityFormComponent implements OnInit {
   private clear(): void {
     this.current = this.password = this.confirmation = '';
     this.visible = { current: false, password: false, confirmation: false };
+  }
+
+  private async deleteLocalAccountData(): Promise<void> {
+    try {
+      await this.reminders.deleteLocalData();
+      this.store.deleteLocalData();
+      this.demo.closeAll();
+      this.demo.identity.set({ name: '', email: '', verified: false });
+      this.guestAccess.clearAccountAccess();
+      this.clear();
+      this.confirming.set(false);
+      this.flow.state.set('success');
+    } catch {
+      this.flow.state.set('error');
+      this.flow.error.set('No se pudo completar la eliminación. Inténtalo de nuevo.');
+    }
   }
 }

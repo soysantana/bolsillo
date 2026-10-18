@@ -1,7 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { Observable, delay, of, throwError } from 'rxjs';
+import { AuthApiService } from '../../core/services/auth-api.service';
 import { AuthComponent } from './auth.component';
 
 @Component({
@@ -9,6 +12,36 @@ import { AuthComponent } from './auth.component';
   template: '',
 })
 class HomeStubComponent {}
+
+class AuthApiStub {
+  loginError: unknown;
+  registerError: unknown;
+  authenticated = () => false;
+  login(): Observable<void> {
+    if (this.loginError) return throwError(() => this.loginError).pipe(delay(450));
+    return delayedVoid();
+  }
+  register(): Observable<void> {
+    if (this.registerError) return throwError(() => this.registerError).pipe(delay(450));
+    return delayedVoid();
+  }
+  forgotPassword(): Observable<void> {
+    return delayedVoid();
+  }
+  resetPassword(): Observable<void> {
+    return delayedVoid();
+  }
+  verifyEmail(): Observable<void> {
+    return delayedVoid();
+  }
+  resendVerification(): Observable<void> {
+    return delayedVoid();
+  }
+}
+
+function delayedVoid(): Observable<void> {
+  return of(undefined).pipe(delay(450));
+}
 
 describe('Authentication UI preview', () => {
   const authRoutes = (
@@ -21,7 +54,10 @@ describe('Authentication UI preview', () => {
 
   async function open(screen: string) {
     await TestBed.configureTestingModule({
-      providers: [provideRouter([...authRoutes, { path: 'inicio', component: HomeStubComponent }])],
+      providers: [
+        provideRouter([...authRoutes, { path: 'inicio', component: HomeStubComponent }]),
+        { provide: AuthApiService, useClass: AuthApiStub },
+      ],
     }).compileComponents();
     const harness = await RouterTestingHarness.create();
     const component = await harness.navigateByUrl(`/${screen}`, AuthComponent);
@@ -92,8 +128,62 @@ describe('Authentication UI preview', () => {
     expect(TestBed.inject(Router).url).toBe('/inicio');
   });
 
+  it('separates invalid credentials from temporary verification issues', async () => {
+    const { harness, component } = await open('login');
+    const auth = TestBed.inject(AuthApiService) as unknown as AuthApiStub;
+    auth.loginError = new HttpErrorResponse({ status: 0 });
+    await fill(harness, { email: 'ana@example.com', password: 'Secret123!' });
+    expect(component.error).toBe(
+      'No pudimos verificar tus datos ahora. Inténtalo de nuevo en unos minutos.',
+    );
+
+    auth.loginError = new HttpErrorResponse({ status: 401 });
+    await fill(harness, { password: 'Secret123!' });
+    expect(component.error).toBe(
+      'El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.',
+    );
+  });
+
+  it('shows the disabled account message returned by the API', async () => {
+    const { harness, component } = await open('login');
+    const auth = TestBed.inject(AuthApiService) as unknown as AuthApiStub;
+    auth.loginError = new HttpErrorResponse({
+      status: 401,
+      error: {
+        message: 'Tu cuenta está desactivada. Contacta soporte para recuperar el acceso.',
+      },
+    });
+
+    await fill(harness, { email: 'ana@example.com', password: 'Secret123!' });
+
+    expect(component.error).toBe(
+      'Tu cuenta está desactivada. Contacta soporte para recuperar el acceso.',
+    );
+  });
+
+  it('does not blame registration data when the request cannot be completed now', async () => {
+    const { harness, component } = await open('register');
+    const auth = TestBed.inject(AuthApiService) as unknown as AuthApiStub;
+    auth.registerError = new HttpErrorResponse({ status: 0 });
+    await fill(harness, {
+      name: 'Ana',
+      email: 'ana@example.com',
+      password: 'Abcdef12!',
+      confirmation: 'Abcdef12!',
+    });
+    expect(component.error).toBe(
+      'No pudimos crear tu cuenta ahora. Inténtalo de nuevo en unos minutos.',
+    );
+
+    auth.registerError = new HttpErrorResponse({ status: 409 });
+    await fill(harness, { confirmation: 'Abcdef12!' });
+    expect(component.error).toBe(
+      'Ya hay una cuenta con este correo. Inicia sesión o recupera tu contraseña.',
+    );
+  });
+
   it('clears sensitive fields and success state when navigating between forms', async () => {
-    const { harness, component } = await open('reset-password');
+    const { harness, component } = await open('reset-password?token=valid-token-123');
     harness.routeNativeElement!.querySelector<HTMLButtonElement>('.visibility')!.click();
     await fill(harness, { password: 'Secret123!', confirmation: 'Secret123!' });
     expect(component.done).toBe(true);
@@ -115,6 +205,7 @@ describe('Avisos y cancelación del acceso', () => {
           ),
           { path: 'inicio', component: HomeStubComponent },
         ]),
+        { provide: AuthApiService, useClass: AuthApiStub },
       ],
     }),
   );

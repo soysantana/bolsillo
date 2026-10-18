@@ -6,11 +6,15 @@ const ACCOUNT_ACCESS_KEY = 'bolsillo-account-access';
 @Injectable({ providedIn: 'root' })
 export class GuestAccessService {
   canOpenApp(): boolean {
-    return this.hasAcceptedPolicies() || localStorage.getItem(ACCOUNT_ACCESS_KEY) === 'true';
+    return this.hasAccountAccess() || this.hasAcceptedPolicies();
   }
 
   hasAcceptedPolicies(): boolean {
     return localStorage.getItem(GUEST_POLICY_ACCEPTED_KEY) === 'true';
+  }
+
+  hasAccountAccess(): boolean {
+    return localStorage.getItem(ACCOUNT_ACCESS_KEY) === 'true';
   }
 
   acceptPolicies(): void {

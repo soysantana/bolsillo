@@ -1,10 +1,15 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { AccountDemo, PreviewAction, exitMessages, ExitReason } from '../account/account-demo';
 import { passwordChecks } from './password-policy';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { AuthApiService } from '../../core/services/auth-api.service';
+import { LocalDataLinkService } from '../../core/services/local-data-link.service';
+import { authApiMessage } from '../../core/services/api-error-message';
 
 type Screen = 'login' | 'register' | 'forgot-password' | 'verify-email' | 'reset-password';
 const routeByScreen: Record<Screen, string> = {
@@ -68,6 +73,8 @@ export class AuthComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthApiService);
+  private readonly localDataLink = inject(LocalDataLinkService);
   readonly flow = inject(PreviewAction);
   private readonly demo = inject(AccountDemo);
   screen: Screen = 'login';
@@ -84,6 +91,9 @@ export class AuthComponent {
   done = false;
   resent = false;
   error = '';
+  showLocalDataLink = false;
+  localDataLinkRequested = false;
+  private token = '';
 
   constructor() {
     const navigationState = this.router.getCurrentNavigation()?.extras.state;
@@ -106,6 +116,8 @@ export class AuthComponent {
       this.screen = screen as Screen;
       this.clearPasswords();
       this.submitted = this.done = this.resent = false;
+      this.showLocalDataLink = false;
+      this.localDataLinkRequested = false;
       const scenario = this.flow.configure(this.screen);
       this.operation = scenario.operation ?? 'verify';
       this.error = scenario.error ?? '';
@@ -117,6 +129,12 @@ export class AuthComponent {
       if (this.screen === 'login' && scenario.state === 'expired')
         this.notice = exitMessages.expired;
       if (this.screen === 'verify-email' && !this.email) this.email = this.demo.identity().email;
+      this.changeDetector.markForCheck();
+    });
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.token = params.get('token') ?? '';
+      const email = params.get('email');
+      if (email) this.email = email;
       this.changeDetector.markForCheck();
     });
   }
@@ -155,21 +173,58 @@ export class AuthComponent {
   verify(): void {
     if (this.busy) return;
     this.operation = 'verify';
-    this.flow.run(() => {
-      this.demo.identity.update((identity) => ({ ...identity, verified: true }));
-      this.done = true;
-      this.changeDetector.markForCheck();
-    });
+    if (!this.token) {
+      this.error = 'Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.';
+      return;
+    }
+    this.flow.state.set('loading');
+    this.flow.error.set('');
+    this.auth
+      .verifyEmail(this.token)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.changeDetector.markForCheck()),
+      )
+      .subscribe({
+        next: () => {
+          this.demo.identity.update((identity) => ({ ...identity, verified: true }));
+          this.done = true;
+          this.flow.state.set('success');
+        },
+        error: (error: unknown) => {
+          this.flow.state.set('error');
+          this.error =
+            authApiMessage(error) ??
+            'Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.';
+        },
+      });
   }
   resend(): void {
     if (this.busy) return;
     this.operation = 'resend';
-    this.flow.run(() => {
-      this.resent = true;
-      this.flow.state.set('resent');
-      this.error = '';
-      this.changeDetector.markForCheck();
-    });
+    if (!this.email) {
+      this.error = 'Escribe un correo electrónico válido.';
+      return;
+    }
+    this.flow.state.set('loading');
+    this.flow.error.set('');
+    this.auth
+      .resendVerification(this.email)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.changeDetector.markForCheck()),
+      )
+      .subscribe({
+        next: () => {
+          this.resent = true;
+          this.flow.state.set('resent');
+          this.error = '';
+        },
+        error: (error: unknown) => {
+          this.flow.state.set('error');
+          this.error = authApiMessage(error) ?? 'La solicitud no se completó. Inténtalo de nuevo.';
+        },
+      });
   }
   private clearPasswords(): void {
     this.password = this.confirmation = '';
@@ -193,16 +248,103 @@ export class AuthComponent {
       this.error = 'Las contraseñas no coinciden. Revisa e inténtalo de nuevo.';
       return;
     }
-    this.flow.run(() => {
-      this.clearPasswords();
-      if (this.screen === 'login') {
-        void this.router.navigateByUrl('/inicio');
-      } else if (this.screen === 'register') {
-        void this.router.navigateByUrl(routeByScreen['verify-email'], {
-          state: { email: this.email },
-        });
-      } else this.done = true;
-      this.changeDetector.markForCheck();
-    });
+    this.flow.state.set('loading');
+    this.flow.error.set('');
+    const request =
+      this.screen === 'login'
+        ? this.auth.login(this.email, this.password)
+        : this.screen === 'register'
+          ? this.auth.register(this.name, this.email, this.password)
+          : this.screen === 'forgot-password'
+            ? this.auth.forgotPassword(this.email)
+            : this.auth.resetPassword(this.token, this.password);
+
+    if (this.screen === 'reset-password' && !this.token) {
+      this.flow.state.set('error');
+      this.error = 'Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.';
+      return;
+    }
+
+    request
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.changeDetector.markForCheck()),
+      )
+      .subscribe({
+        next: () => {
+          this.clearPasswords();
+          this.flow.state.set('success');
+          if (this.screen === 'login') {
+            this.afterAccountAccess();
+          } else if (this.screen === 'register') {
+            this.prepareLocalDataLink();
+            void this.router.navigateByUrl(routeByScreen['verify-email'], {
+              state: { email: this.email },
+            });
+          } else this.done = true;
+        },
+        error: (error: unknown) => {
+          this.flow.state.set('error');
+          this.error = this.safeError(error);
+        },
+      });
+  }
+
+  private safeError(error: unknown): string {
+    const apiMessage = authApiMessage(error);
+    if (apiMessage) return apiMessage;
+    if (this.screen === 'login') return this.loginError(error);
+    if (this.screen === 'register') return this.registerError(error);
+    if (this.screen === 'reset-password')
+      return 'Este enlace no es válido o ya venció. Solicita uno nuevo para continuar.';
+    return 'La solicitud no se completó. Inténtalo de nuevo.';
+  }
+
+  private loginError(error: unknown): string {
+    if (error instanceof HttpErrorResponse && error.status === 401) {
+      return 'El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.';
+    }
+    if (error instanceof HttpErrorResponse && error.status === 0) {
+      return 'No pudimos verificar tus datos ahora. Inténtalo de nuevo en unos minutos.';
+    }
+    return 'Algo impidió completar el inicio de sesión. Inténtalo de nuevo.';
+  }
+
+  private registerError(error: unknown): string {
+    if (error instanceof HttpErrorResponse && error.status === 0) {
+      return 'No pudimos crear tu cuenta ahora. Inténtalo de nuevo en unos minutos.';
+    }
+    if (error instanceof HttpErrorResponse && error.status === 409) {
+      return 'Ya hay una cuenta con este correo. Inicia sesión o recupera tu contraseña.';
+    }
+    if (error instanceof HttpErrorResponse && error.status === 400) {
+      return 'Revisa los datos e inténtalo de nuevo.';
+    }
+    return 'Algo impidió completar el registro. Inténtalo de nuevo.';
+  }
+
+  linkLocalData(): void {
+    this.localDataLink.requestLink(this.email);
+    this.localDataLinkRequested = true;
+    void this.router.navigateByUrl('/inicio');
+  }
+
+  continueWithoutLinking(): void {
+    void this.router.navigateByUrl('/inicio');
+  }
+
+  private afterAccountAccess(): void {
+    if (this.localDataLink.hasLocalDataToLink()) {
+      this.showLocalDataLink = true;
+      return;
+    }
+    void this.router.navigateByUrl('/inicio');
+  }
+
+  private prepareLocalDataLink(): void {
+    if (this.localDataLink.hasLocalDataToLink()) {
+      this.localDataLink.requestLink(this.email);
+      this.localDataLinkRequested = true;
+    }
   }
 }

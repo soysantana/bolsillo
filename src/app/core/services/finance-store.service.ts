@@ -332,6 +332,23 @@ export class FinanceStore {
   backup(): string {
     return JSON.stringify(this.data(), null, 2);
   }
+  hasMeaningfulLocalData(): boolean {
+    const data = this.data();
+    const fresh = this.fresh();
+    return (
+      data.transactions.length > 0 ||
+      data.goals.length > 0 ||
+      data.payments.length > 0 ||
+      data.accounts.some(
+        (account, index) =>
+          account.name !== fresh.accounts[index]?.name ||
+          account.openingBalance !== fresh.accounts[index]?.openingBalance,
+      ) ||
+      data.budgets.some((budget) => budget.limit > 0) ||
+      data.name !== fresh.name ||
+      data.hideBalances !== fresh.hideBalances
+    );
+  }
   deleteLocalData(): void {
     // Remove legacy sources first so a later load cannot migrate deleted data back.
     for (const key of ['bolsillo-transactions', 'bolsillo-budgets', KEY]) {
