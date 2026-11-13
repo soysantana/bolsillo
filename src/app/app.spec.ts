@@ -67,6 +67,8 @@ describe('App', () => {
 
     fixture.nativeElement.querySelector('.secondary-action').click();
     await fixture.whenStable();
+    fixture.nativeElement.querySelector('.policy-modal .secondary-action').click();
+    await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain(
       'Acepta las políticas para continuar sin cuenta.',
     );
@@ -77,7 +79,7 @@ describe('App', () => {
     checkbox.checked = true;
     checkbox.dispatchEvent(new Event('change'));
     await fixture.whenStable();
-    fixture.nativeElement.querySelector('.secondary-action').click();
+    fixture.nativeElement.querySelector('.policy-modal .secondary-action').click();
     await fixture.whenStable();
 
     expect(TestBed.inject(Router).url).toBe('/inicio');

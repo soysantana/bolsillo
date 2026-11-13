@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FinanceStore } from '../../core/services/finance-store.service';
 import { localDate } from '../../core/models/finance.models';
 import { PaymentReminderService } from '../../core/services/payment-reminder.service';
+import { BrowserPushService } from '../../core/services/browser-push.service';
 import { downloadFile } from '../../shared/download';
 import { FeedbackService, FeedbackType } from '../../core/services/feedback.service';
 @Component({
@@ -32,11 +33,13 @@ export class ProfileComponent implements OnInit {
   constructor(
     readonly store: FinanceStore,
     readonly reminders: PaymentReminderService,
+    readonly browserPush: BrowserPushService,
     private readonly feedback: FeedbackService,
     private readonly changeDetector: ChangeDetectorRef,
   ) {}
   ngOnInit(): void {
     void this.reminders.refreshPermissionStatus();
+    void this.browserPush.refreshNotifications();
   }
   editName(): void {
     this.name = this.store.name();
@@ -45,6 +48,22 @@ export class ProfileComponent implements OnInit {
   }
 
   async togglePaymentReminders(): Promise<void> {
+    if (this.browserPush.supported()) {
+      if (this.browserPush.enabled()) {
+        await this.browserPush.disable();
+        this.store.notice.set('Notificaciones desactivadas.');
+      } else {
+        const result = await this.browserPush.enable(this.store.payments());
+        this.store.notice.set(
+          result === 'enabled'
+            ? 'Notificaciones activadas.'
+            : result === 'denied'
+              ? 'Permite las notificaciones del navegador para recibir avisos.'
+              : 'Este navegador no pudo activar las notificaciones.',
+        );
+      }
+      return;
+    }
     if (this.reminders.enabled()) {
       await this.reminders.disable(this.store.payments());
       this.store.notice.set('Notificaciones desactivadas.');

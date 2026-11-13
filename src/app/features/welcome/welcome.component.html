@@ -20,32 +20,65 @@
         <span>Iniciar sesión</span>
       </a>
 
-      <form class="guest-card" (ngSubmit)="continueWithoutAccount()" novalidate>
-        <div>
-          <strong>Continuar sin cuenta</strong>
-          <p>Tus datos se guardan en este navegador. Si borras sus datos, podrías perderlos.</p>
-        </div>
-
-        <label class="policy-check" [class.invalid]="submitted && !acceptedPolicies">
-          <input
-            type="checkbox"
-            name="acceptedPolicies"
-            [(ngModel)]="acceptedPolicies"
-            required
-            [attr.aria-invalid]="submitted && !acceptedPolicies"
-          />
-          <span>Acepto el aviso de privacidad y entiendo cómo se guardan mis datos.</span>
-        </label>
-
-        @if (submitted && !acceptedPolicies) {
-          <p class="policy-error" role="alert">Acepta las políticas para continuar sin cuenta.</p>
-        }
-
-        <button class="secondary-action" type="submit">
+      <div class="guest-card">
+        <button class="secondary-action" type="button" (click)="openPolicyModal()">
           <app-icon name="arrow" />
-          <span>Usar sin cuenta</span>
+          <span>Continuar sin cuenta</span>
         </button>
-      </form>
+      </div>
     </div>
   </section>
+
+  @if (isPolicyModalOpen) {
+    <div class="modal-backdrop" (click)="closePolicyModal()">
+      <section
+        class="policy-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="policy-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">Antes de continuar</span>
+            <h2 id="policy-title">Aviso de privacidad</h2>
+          </div>
+          <button class="close-modal" type="button" aria-label="Cerrar" (click)="closePolicyModal()">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+
+        <div class="policy-content">
+          <p>
+            Al usar Bolsillo sin cuenta, tus datos se guardan únicamente en este dispositivo y en
+            el almacenamiento local de este navegador.
+          </p>
+          <p>
+            No podremos recuperar tus datos si borras los datos del navegador, desinstalas la app
+            o cambias de dispositivo. Puedes crear una cuenta más adelante para usar el acceso con
+            sincronización.
+          </p>
+        </div>
+
+        <form class="policy-form" (ngSubmit)="continueWithoutAccount()" novalidate>
+          <label class="policy-check" [class.invalid]="submitted && !acceptedPolicies">
+            <input
+              type="checkbox"
+              name="acceptedPolicies"
+              [(ngModel)]="acceptedPolicies"
+              required
+              [attr.aria-invalid]="submitted && !acceptedPolicies"
+            />
+            <span>Acepto el aviso de privacidad y entiendo cómo se guardan mis datos.</span>
+          </label>
+
+          @if (submitted && !acceptedPolicies) {
+            <p class="policy-error" role="alert">Acepta las políticas para continuar sin cuenta.</p>
+          }
+
+          <button class="secondary-action" type="submit">Continuar sin cuenta</button>
+        </form>
+      </section>
+    </div>
+  }
 </main>

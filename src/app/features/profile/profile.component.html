@@ -98,7 +98,7 @@
         class="menu-row link-row"
         type="button"
         role="switch"
-        [attr.aria-checked]="reminders.enabled()"
+        [attr.aria-checked]="browserPush.supported() ? browserPush.enabled() : reminders.enabled()"
         (click)="togglePaymentReminders()"
       >
         <span class="menu-icon lilac"><app-icon name="notifications" /></span>
@@ -106,7 +106,7 @@
           ><strong>Notificaciones</strong
           ><small>Avisos de pagos, presupuesto y actividad</small></span
         >
-        <i class="toggle" [class.on]="reminders.enabled()" aria-hidden="true"><b></b></i>
+        <i class="toggle" [class.on]="browserPush.supported() ? browserPush.enabled() : reminders.enabled()" aria-hidden="true"><b></b></i>
       </button>
       @if (reminders.enabled() && reminders.blockedBySystem()) {
         <div class="menu-row settings-alert" role="note">
@@ -119,6 +119,17 @@
             ></span
           >
           <button type="button" (click)="openNotificationSettings()">Ir a Ajustes</button>
+        </div>
+      }
+      @if (browserPush.notifications().length) {
+        <div class="notification-center" aria-label="Notificaciones recientes">
+          <strong>Notificaciones recientes</strong>
+          @for (notification of browserPush.notifications(); track notification.id) {
+            <button type="button" [class.unread]="!notification.readAt" (click)="browserPush.markNotificationRead(notification.id)">
+              <span>{{ notification.title }}</span>
+              <small>{{ notification.body }}</small>
+            </button>
+          }
         </div>
       }
       <div class="menu-row future-row">

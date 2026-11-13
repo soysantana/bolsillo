@@ -7,6 +7,7 @@ import {
 } from '../core/services/campaign-message.service';
 import { MobileViewportService } from '../core/services/mobile-viewport.service';
 import { PaymentReminderService } from '../core/services/payment-reminder.service';
+import { BrowserPushService } from '../core/services/browser-push.service';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { ModalController } from '@ionic/angular';
@@ -24,6 +25,7 @@ export class ShellComponent {
     readonly store: FinanceStore,
     readonly campaigns: CampaignMessageService,
     private readonly reminders: PaymentReminderService,
+    private readonly browserPush: BrowserPushService,
     private readonly modalController: ModalController,
   ) {
     void this.reminders.refreshPermissionStatus();
@@ -32,6 +34,7 @@ export class ShellComponent {
       this.store.transactions(),
       this.store.budgets(),
     );
+    void this.browserPush.initializeOnOpen(this.store.payments());
     void CapacitorApp.addListener('resume', () => {
       void this.reminders.refreshPermissionStatus();
     }).catch(() => undefined);

@@ -51,12 +51,13 @@ describe('Finance screens', () => {
   it('presents Face ID as upcoming while notifications are available', async () => {
     const fixture = TestBed.createComponent(ProfileComponent);
     await fixture.whenStable();
-    const futureRows = fixture.nativeElement.querySelectorAll('.future-row');
-    expect(futureRows).toHaveLength(1);
+    const futureRows = Array.from(fixture.nativeElement.querySelectorAll('.future-row')) as HTMLElement[];
+    const faceIdRow = futureRows.find((row) => row.textContent?.includes('Face ID'));
+    expect(faceIdRow).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Avisos de pagos, presupuesto y actividad');
-    expect(futureRows[0].textContent).toContain('Face ID');
-    expect(futureRows[0].textContent).toContain('Próximamente');
-    expect(futureRows[0].querySelector('button, input, [role="switch"]')).toBeNull();
+    expect(faceIdRow?.textContent).toContain('Face ID');
+    expect(faceIdRow?.textContent).toContain('Próximamente');
+    expect(faceIdRow?.querySelector('button, input, [role="switch"]')).toBeNull();
     expect(fixture.nativeElement.textContent).not.toContain('Cuentas conectadas');
     expect(fixture.nativeElement.textContent).not.toContain('Agregar cuenta');
   });

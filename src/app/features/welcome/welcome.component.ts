@@ -16,6 +16,7 @@ export class WelcomeComponent {
   private readonly router = inject(Router);
   acceptedPolicies = false;
   submitted = false;
+  isPolicyModalOpen = false;
 
   constructor() {
     if (this.guestAccess.hasAcceptedPolicies()) {
@@ -23,11 +24,21 @@ export class WelcomeComponent {
     }
   }
 
+  openPolicyModal(): void {
+    this.submitted = false;
+    this.isPolicyModalOpen = true;
+  }
+
+  closePolicyModal(): void {
+    this.isPolicyModalOpen = false;
+  }
+
   continueWithoutAccount(): void {
     this.submitted = true;
     if (!this.acceptedPolicies) return;
 
     this.guestAccess.acceptPolicies();
+    this.isPolicyModalOpen = false;
     void this.router.navigateByUrl('/inicio', { replaceUrl: true });
   }
 }

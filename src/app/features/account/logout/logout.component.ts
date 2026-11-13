@@ -5,6 +5,7 @@ import { PreviewAction } from '../account-demo';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { AuthApiService } from '../../../core/services/auth-api.service';
+import { BrowserPushService } from '../../../core/services/browser-push.service';
 @Component({
   selector: 'app-logout',
   imports: [ConfirmationComponent, IconComponent],
@@ -18,6 +19,7 @@ export class LogoutComponent {
   readonly opened = signal(false);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthApiService);
+  private readonly browserPush = inject(BrowserPushService);
   constructor() {
     const scenario = this.flow.configure('logout');
     this.opened.set(scenario.state !== 'initial');
@@ -29,6 +31,7 @@ export class LogoutComponent {
   confirm(): void {
     this.flow.state.set('loading');
     this.flow.error.set('');
+    void this.browserPush.unregister();
     this.auth
       .logout()
       .pipe(finalize(() => this.opened.set(false)))
