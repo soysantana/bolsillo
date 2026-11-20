@@ -15,11 +15,11 @@
     </div>
 
     <div class="action-stack" aria-label="Opciones de acceso">
-      <a class="primary-action" routerLink="/login">
+      <button class="primary-action" type="button" disabled aria-describedby="auth-coming-soon">
         <app-icon name="profile" />
-        <span>Iniciar sesión</span>
-      </a>
-
+        <span>Iniciar sesión · Próximamente</span>
+      </button>
+      
       <div class="guest-card">
         <button class="secondary-action" type="button" (click)="openPolicyModal()">
           <app-icon name="arrow" />

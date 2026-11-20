@@ -21,6 +21,11 @@ export class TransactionsComponent {
       return filter === 'all' || transaction.kind === filter;
     }),
   );
+  readonly summaryTotal = computed(() => {
+    if (this.filter() === 'income') return this.store.monthIncome();
+    if (this.filter() === 'expense') return this.store.monthExpenses();
+    return this.store.monthIncome() - this.store.monthExpenses();
+  });
   constructor(
     readonly store: FinanceStore,
     private readonly modalController: ModalController,

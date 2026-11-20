@@ -1,21 +1,11 @@
 @if (variant() === 'icon') {
-  <button class="logout-icon" type="button" aria-label="Cerrar sesión" (click)="opened.set(true)">
+  <button class="logout-icon" type="button" aria-label="Cerrar sesión, próximamente" disabled title="Próximamente">
     <app-icon name="logout" />
   </button>
 } @else {
-  <button class="logout-row" type="button" (click)="opened.set(true)">
+  <button class="logout-row" type="button" disabled title="Próximamente">
     <app-icon name="logout" /><span
-      ><strong>Cerrar sesión</strong><small>Salir de tu cuenta en este dispositivo</small></span
+      ><strong>Cerrar sesión · Próximamente</strong><small>Salir de tu cuenta en este dispositivo</small></span
     ><app-icon name="chevron" />
   </button>
-}
-@if (opened()) {
-  <app-confirmation
-    title="¿Cerrar sesión?"
-    description="Puedes volver a iniciar sesión cuando quieras. Tus datos financieros seguirán en este dispositivo."
-    [busy]="flow.state() === 'loading'"
-    [error]="flow.error()"
-    (confirmed)="confirm()"
-    (cancelled)="cancel()"
-  />
 }

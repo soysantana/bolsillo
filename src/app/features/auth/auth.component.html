@@ -105,7 +105,7 @@
               }
             } @else {
               <form #form="ngForm" (ngSubmit)="submit(form)" novalidate [attr.aria-busy]="busy">
-                <fieldset [disabled]="busy">
+                <fieldset [disabled]="busy || screen === 'login' || screen === 'register'">
                   @if (screen === 'register') {
                     <div class="field">
                       <label for="name">Tu nombre</label>
@@ -277,8 +277,8 @@
                   @if (error) {
                     <p class="form-error" role="alert">{{ error }}</p>
                   }
-                  <button type="submit" class="primary" [disabled]="busy">
-                    {{ busy ? progressMessage : content.action }} <app-icon name="arrow" />
+                  <button type="submit" class="primary" [disabled]="busy || screen === 'login' || screen === 'register'">
+                    {{ screen === 'login' || screen === 'register' ? 'Próximamente' : busy ? progressMessage : content.action }} <app-icon name="arrow" />
                   </button>
                 </fieldset>
               </form>

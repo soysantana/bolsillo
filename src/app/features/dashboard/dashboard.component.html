@@ -106,7 +106,7 @@
       </div>
       <a routerLink="/plan" aria-label="Ver pagos pendientes"><app-icon name="arrow" /></a>
     </section>
-  } @else if (!store.transactions().length) {
+  } @else if (!store.transactions().length && store.account().openingBalance === 0) {
     <section class="section-block pocket-tip">
       <app-icon name="wallet" />
       <div><p>Agrega el saldo inicial de tu cuenta para empezar.</p></div>

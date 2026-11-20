@@ -4,8 +4,8 @@
   </header>
   <app-month-navigation [value]="store.selectedMonth()" (valueChange)="changeMonth($event)" />
   <section class="month-summary">
-    <span>Gastos del mes</span>
-    <strong>{{ store.formatMoney(store.monthExpenses()) }}</strong>
+    <span>{{ filter() === 'income' ? 'Ingresos del mes' : filter() === 'expense' ? 'Gastos del mes' : 'Balance del mes' }}</span>
+    <strong>{{ filter() === 'all' && summaryTotal() > 0 ? '+' : '' }}{{ store.formatMoney(summaryTotal()) }}</strong>
   </section>
   <div class="filters" role="group" aria-label="Tipo de movimiento">
     <button

@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { GuestAccessService } from '../../core/services/guest-access.service';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [FormsModule, RouterLink, IconComponent],
+  imports: [FormsModule, IconComponent],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',
 })
